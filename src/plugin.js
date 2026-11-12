@@ -5,7 +5,7 @@
 // keys), a button on the Today page, and opens the dashboard when the app
 // starts on Today (the app's start-page setting can't point at a plugin view).
 var SETTINGS_KEY = 'settings';
-var SESSION_FLAG = 'goal-dashboard-startup-done';
+var SESSION_FLAG = 'aim-dashboard-startup-done';
 
 function openDashboard() {
   PluginAPI.showIndexHtmlAsView();

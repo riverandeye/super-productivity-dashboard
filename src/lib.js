@@ -129,7 +129,7 @@
       var topT = parent ? parent.t : t;
       var row = s.taskRows[topId];
       if (!row) {
-        row = s.taskRows[topId] = { id: topId, title: topT.title || '', total: 0, done: 0, planStart: null, planEnd: null, archived: e.archived && !parent, order: s.taskOrder.length };
+        row = s.taskRows[topId] = { id: topId, title: topT.title || '', total: 0, done: 0, items: [], planStart: null, planEnd: null, archived: e.archived && !parent, order: s.taskOrder.length };
         s.taskOrder.push(topId);
       }
       var isLeaf = !!t.parentId || !(childrenOf[t.id] && childrenOf[t.id].length);
@@ -154,6 +154,7 @@
       if (done) s.done++;
       row.total++;
       if (done) row.done++;
+      row.items.push({ id: t.id, title: leaf.title, plan: plan, done: done, doneDay: leaf.doneDay });
       if (plan != null) {
         if (row.planStart == null || plan < row.planStart) row.planStart = plan;
         if (row.planEnd == null || plan > row.planEnd) row.planEnd = plan;
@@ -288,6 +289,17 @@
       .map(function (id) {
         var r = s.taskRows[id];
         r.ratio = r.total ? r.done / r.total : 0;
+        r.items.sort(function (a, b) {
+          var pa = a.plan == null ? Infinity : a.plan;
+          var pb = b.plan == null ? Infinity : b.plan;
+          return pa - pb;
+        });
+        r.dueBefore = r.items.filter(function (x) {
+          return x.plan != null && x.plan < today;
+        }).length;
+        r.datedDone = r.items.filter(function (x) {
+          return x.plan != null && x.done;
+        }).length;
         r.order = id in s.taskIdx ? s.taskIdx[id] : BIG + r.order;
         return r;
       })

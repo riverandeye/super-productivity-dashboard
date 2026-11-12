@@ -80,8 +80,6 @@
   "NO_GOALS": "프로젝트가 없어요. 프로젝트를 만들면 대시보드가 보여요.",
   "SINCE": "{{date}}부터",
   "RING_NOTE": "안쪽 링: 계획 기간 중 지난 비율",
-  "TASKS": "태스크",
-  "TASKS_SUB": "{{n}}개",
   "OF_TODAY": "오늘 계획 +{{n}} 중",
   "PACE_HINT": "오늘 전 계획 {{due}}개 중 {{done}}개 완료",
   "PLAN_MARK": "계획상 오늘까지 와 있어야 할 위치",
@@ -96,5 +94,13 @@
   "DAY_STATE_DONE": "체크",
   "DAY_STATE_DONE_OTHER": "완료",
   "DAY_STATE_MISSED": "놓침",
-  "DAY_STATE_PLANNED": "계획"
+  "DAY_STATE_PLANNED": "계획",
+  "TASKS": "태스크",
+  "TASKS_ACTIVE": "진행 중",
+  "TASKS_UPCOMING": "예정",
+  "TASKS_DONE": "완료",
+  "TASK_DONE": "완료",
+  "STARTS_IN": "{{n}}일 후 시작",
+  "SUB_PLANNED_ON": "{{date}} 계획",
+  "NOT_DONE": "아직 안 함"
 }

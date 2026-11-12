@@ -80,8 +80,6 @@
   "NO_GOALS": "No projects yet. Add a project to see its dashboard.",
   "SINCE": "Since {{date}}",
   "RING_NOTE": "Inner ring: share of the plan's days passed",
-  "TASKS": "Tasks",
-  "TASKS_SUB": "{{n}} tasks",
   "OF_TODAY": "of +{{n}} planned today",
   "PACE_HINT": "{{done}} done of {{due}} planned before today",
   "PLAN_MARK": "Where the plan expects you today",
@@ -96,5 +94,13 @@
   "DAY_STATE_DONE": "Checked",
   "DAY_STATE_DONE_OTHER": "Done",
   "DAY_STATE_MISSED": "Missed",
-  "DAY_STATE_PLANNED": "Planned"
+  "DAY_STATE_PLANNED": "Planned",
+  "TASKS": "Tasks",
+  "TASKS_ACTIVE": "In progress",
+  "TASKS_UPCOMING": "Upcoming",
+  "TASKS_DONE": "Done",
+  "TASK_DONE": "Done",
+  "STARTS_IN": "Starts in {{n}}d",
+  "SUB_PLANNED_ON": "Planned {{date}}",
+  "NOT_DONE": "Not done"
 }

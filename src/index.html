@@ -615,70 +615,228 @@
       }
 
       /* ---------- tasks ---------- */
-      .trows {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-        gap: 12px 22px;
-      }
-      .trow-top {
-        display: flex;
-        align-items: baseline;
-        gap: 10px;
-        font-size: 13px;
-      }
-      .trow-title {
+      .sec-head .grow {
         flex: 1;
-        min-width: 0;
-        font-weight: 650;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
       }
-      .trow-title.link {
+      .tg-count {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 12px;
+        color: var(--muted);
+        font-weight: 600;
+        margin-left: 12px;
+      }
+      .tg-count b {
+        color: var(--text);
+        font-variant-numeric: tabular-nums;
+      }
+      .tg-count i {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+      }
+      .tg-active i {
+        background: linear-gradient(135deg, var(--pc), var(--pc2));
+        box-shadow: 0 0 8px var(--pc-glow);
+      }
+      .tg-upcoming i {
+        border: 1.5px dashed var(--pc2);
+      }
+      .tg-done i {
+        background: var(--good);
+      }
+      .tg-head {
+        margin: 18px 0 10px;
+        font-size: 11px;
+        font-weight: 800;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        color: var(--faint);
+      }
+      .sec-head + .tg-head {
+        margin-top: 4px;
+      }
+      .tt-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+        gap: 12px;
+      }
+      .tt {
+        position: relative;
+        display: grid;
+        grid-template-columns: 48px minmax(0, 1fr) auto;
+        grid-template-rows: auto auto;
+        column-gap: 12px;
+        row-gap: 12px;
+        align-items: center;
+        padding: 14px 14px 14px 14px;
+        border-radius: 16px;
+        background: var(--card-hi);
+        border: 1px solid var(--line);
+        overflow: hidden;
+        opacity: 0;
+        animation: rise 0.7s var(--ease) forwards;
+        transition: transform 0.3s var(--ease), border-color 0.3s, box-shadow 0.3s;
+      }
+      .tt::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background: radial-gradient(220px 90px at 0% 0%, var(--pc-soft), transparent 70%);
+        opacity: 0.7;
+        pointer-events: none;
+      }
+      .tt:hover {
+        transform: translateY(-2px);
+        border-color: var(--pc-line);
+        box-shadow: 0 14px 30px -18px var(--pc-glow);
+      }
+      .tt-upcoming {
+        background: transparent;
+        border-style: dashed;
+      }
+      .tt-upcoming::before {
+        opacity: 0.25;
+      }
+      .tt-done::before {
+        background: radial-gradient(220px 90px at 0% 0%, rgba(52, 211, 153, 0.14), transparent 70%);
+      }
+      .tt-behind {
+        border-color: rgba(251, 113, 133, 0.35);
+      }
+      .tt-ring {
+        position: relative;
+        width: 48px;
+        height: 48px;
+      }
+      .tt-ring svg {
+        width: 100%;
+        height: 100%;
+      }
+      .tt-ring span {
+        position: absolute;
+        inset: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 12px;
+        font-weight: 850;
+        font-variant-numeric: tabular-nums;
+        letter-spacing: -0.02em;
+      }
+      .tt-ring small {
+        font-size: 8px;
+        font-weight: 700;
+        opacity: 0.7;
+      }
+      .tt-body {
+        position: relative;
+        min-width: 0;
+      }
+      .tt-title {
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        font-size: 13.5px;
+        font-weight: 750;
+        letter-spacing: -0.01em;
+        line-height: 1.3;
+        overflow: hidden;
+      }
+      .tt-title[data-open] {
         cursor: pointer;
       }
-      .trow-title.link:hover {
+      .tt-title[data-open]:hover {
         text-decoration: underline;
         text-decoration-color: var(--faint);
       }
-      .trow-num {
-        font-size: 12px;
-        color: var(--muted);
-        font-variant-numeric: tabular-nums;
-        white-space: nowrap;
-      }
-      .trow-num b {
-        color: var(--text);
-      }
-      .trow.full .trow-num {
-        color: var(--good);
-      }
-      .trow-bar {
-        position: relative;
-        margin-top: 6px;
-        height: 7px;
-        border-radius: 99px;
-        background: var(--track);
-        overflow: hidden;
-      }
-      .trow-bar .fill {
-        position: absolute;
-        left: 0;
-        top: 0;
-        bottom: 0;
-        width: 0;
-        border-radius: 99px;
-        background: linear-gradient(90deg, var(--pc), var(--pc2));
-        box-shadow: 0 0 10px -1px var(--pc-glow);
-        transition: width 1.3s var(--ease);
-      }
-      .trow-bot {
+      .tt-meta {
+        margin-top: 3px;
         display: flex;
-        justify-content: space-between;
-        margin-top: 4px;
-        font-size: 11px;
-        color: var(--faint);
+        align-items: center;
+        gap: 8px;
+        font-size: 11.5px;
+        color: var(--muted);
+        white-space: nowrap;
+        overflow: hidden;
         font-variant-numeric: tabular-nums;
+      }
+      .tt-num b {
+        color: var(--text);
+        font-weight: 800;
+      }
+      .tt-sep {
+        width: 3px;
+        height: 3px;
+        border-radius: 50%;
+        background: var(--faint);
+        flex: none;
+      }
+      .tt-badge {
+        position: relative;
+        align-self: start;
+        padding: 3px 9px;
+        border-radius: 999px;
+        font-size: 11px;
+        font-weight: 800;
+        white-space: nowrap;
+        font-variant-numeric: tabular-nums;
+        color: var(--pc);
+        background: var(--pc-soft);
+        border: 1px solid var(--pc-line);
+      }
+      .tt-upcoming .tt-badge {
+        color: var(--muted);
+        background: transparent;
+        border-color: var(--line-strong);
+      }
+      .tt-done .tt-badge {
+        color: var(--good);
+        background: rgba(52, 211, 153, 0.1);
+        border-color: rgba(52, 211, 153, 0.35);
+      }
+      .tt-behind .tt-badge {
+        color: var(--bad);
+        background: rgba(251, 113, 133, 0.1);
+        border-color: rgba(251, 113, 133, 0.4);
+      }
+      .tt-pips {
+        position: relative;
+        grid-column: 1 / -1;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 4px;
+      }
+      .pip {
+        width: 10px;
+        height: 10px;
+        border-radius: 3px;
+        background: var(--track);
+        transition: transform 0.15s;
+      }
+      .tt-pips.dense {
+        gap: 3px;
+      }
+      .tt-pips.dense .pip {
+        width: 7px;
+        height: 10px;
+        border-radius: 2px;
+      }
+      .pip:hover {
+        transform: scale(1.5);
+      }
+      .pip.done {
+        background: linear-gradient(135deg, var(--pc), var(--pc2));
+        box-shadow: 0 0 6px -1px var(--pc-glow);
+      }
+      .pip.missed {
+        background: rgba(251, 113, 133, 0.25);
+        box-shadow: inset 0 0 0 1.5px rgba(251, 113, 133, 0.75);
+      }
+      .pip.now {
+        box-shadow: inset 0 0 0 1.5px var(--pc2);
+        animation: breathe 2.4s ease-in-out infinite;
       }
       .pace-stats {
         display: grid;
@@ -1146,10 +1304,6 @@
       }
 
       /* ---------- today panel ---------- */
-      .today-card {
-        position: sticky;
-        top: 16px;
-      }
       .today-head {
         display: flex;
         align-items: center;
@@ -1640,7 +1794,7 @@
         var $err = $('err');
 
         function loadUi() {
-          var d = { burndown: null };
+          var d = { burndown: null, tasksOpen: {} };
           try {
             var s = JSON.parse(localStorage.getItem(UI_KEY) || 'null');
             if (s && typeof s.burndown === 'string') d.burndown = s.burndown;
@@ -1877,7 +2031,7 @@
         // in the plugin API, so read it (read-only) from the host's side nav
         // when reachable, else fall back to getAllProjects() order. The pick is
         // kept for this app session only, so each app start opens the top one.
-        var SEL_KEY = 'goal-dashboard-selected';
+        var SEL_KEY = 'aim-dashboard-selected';
         var selectedId = null;
         try {
           selectedId = sessionStorage.getItem(SEL_KEY);
@@ -1922,6 +2076,7 @@
             sessionStorage.setItem(SEL_KEY, id);
           } catch (e) {}
           ui.showAllOverdue = false;
+          ui.tasksOpen = {};
           selDay = null;
           render(true);
         }
@@ -1945,6 +2100,7 @@
           renderHero();
           renderBurndown();
           renderHeatmap();
+          pipData = {};
           renderTasks();
           renderToday();
           renderPace();
@@ -2379,37 +2535,101 @@
         }
 
         // ---------- tasks ----------
+        /** in progress / behind / upcoming / done, from the task's subtasks. */
+        function taskState(r) {
+          if (r.total && r.done === r.total) return 'done';
+          if (r.dueBefore > r.datedDone) return 'behind';
+          if (r.done > 0 || (r.planStart != null && r.planStart <= model.today)) return 'active';
+          return 'upcoming';
+        }
         function renderTasks() {
           var p = cur;
-          var html = '<div class="sec-head"><h2>' + esc(t('TASKS')) + '</h2><span class="sub">' + esc(t('TASKS_SUB', { n: p.tasks.length })) + '</span></div>';
-          if (!p.tasks.length) {
-            $('tasksCard').innerHTML = html + '<div class="empty">' + esc(t('NO_ITEMS')) + '</div>';
-            return;
-          }
-          html += '<div class="trows">';
+          var card = $('tasksCard');
+          var groups = { active: [], upcoming: [], done: [] };
           p.tasks.forEach(function (r) {
-            var full = r.total && r.done === r.total;
-            html += '<div class="trow' + (full ? ' full' : '') + '">';
-            html += '<div class="trow-top"><span class="trow-title" data-open="' + (r.archived ? '' : esc(r.id)) + '">' + esc(r.title || t('UNTITLED')) + '</span>';
-            html += '<span class="trow-num">' + (full ? '✓ ' : '') + '<b>' + fmtNum(r.done) + '</b> / ' + fmtNum(r.total) + '</span></div>';
-            html += '<div class="trow-bar"><div class="fill" data-w="' + (r.ratio * 100).toFixed(2) + '%"></div></div>';
-            var dates = '';
-            if (r.planStart != null) dates = r.planStart === r.planEnd ? fmtShort(r.planStart) : fmtShort(r.planStart) + ' – ' + fmtShort(r.planEnd);
-            html += '<div class="trow-bot"><span>' + esc(dates) + '</span><span>' + esc(fmtNum(r.ratio * 100) + '%') + '</span></div>';
-            html += '</div>';
+            if (!r.total) return;
+            var st = taskState(r);
+            (st === 'behind' ? groups.active : groups[st]).push({ r: r, st: st });
+          });
+          groups.active.sort(function (a, b) {
+            return (a.st === 'behind' ? 0 : 1) - (b.st === 'behind' ? 0 : 1) || (a.r.planEnd == null ? 1e9 : a.r.planEnd) - (b.r.planEnd == null ? 1e9 : b.r.planEnd);
+          });
+          groups.upcoming.sort(function (a, b) {
+            return (a.r.planStart == null ? 1e9 : a.r.planStart) - (b.r.planStart == null ? 1e9 : b.r.planStart);
+          });
+          var html = '<div class="sec-head"><h2>' + esc(t('TASKS')) + '</h2><span class="grow"></span>';
+          ['active', 'upcoming', 'done'].forEach(function (g) {
+            html += '<span class="tg-count tg-' + g + '"><i></i>' + esc(t('TASKS_' + g.toUpperCase())) + ' <b>' + groups[g].length + '</b></span>';
           });
           html += '</div>';
-          var card = $('tasksCard');
+          if (!p.tasks.length) {
+            card.innerHTML = html + '<div class="empty">' + esc(t('NO_ITEMS')) + '</div>';
+            return;
+          }
+          var n = 0;
+          ['active', 'upcoming', 'done'].forEach(function (g) {
+            if (!groups[g].length) return;
+            html += '<div class="tg-head">' + esc(t('TASKS_' + g.toUpperCase())) + '</div><div class="tt-grid">';
+            var list = groups[g];
+            var limit = g === 'active' || ui.tasksOpen[g] ? list.length : 4;
+            list.slice(0, limit).forEach(function (x) {
+              html += taskTile(x.r, x.st, n++);
+            });
+            html += '</div>';
+            if (list.length > 4 && g !== 'active') html += '<button class="more" data-more="' + g + '">' + esc(ui.tasksOpen[g] ? t('SHOW_LESS') : t('SHOW_MORE', { n: list.length - 4 })) + '</button>';
+          });
           card.innerHTML = html;
-          card.querySelectorAll('[data-open]').forEach(function (el) {
-            var id = el.getAttribute('data-open');
-            if (!id) return;
-            el.classList.add('link');
-            el.title = t('OPEN_TASK');
-            el.addEventListener('click', function () {
-              if (typeof PluginAPI.selectTask === 'function') PluginAPI.selectTask(id).catch(function () {});
+          card.querySelectorAll('[data-more]').forEach(function (b) {
+            b.addEventListener('click', function () {
+              var g = b.getAttribute('data-more');
+              ui.tasksOpen[g] = !ui.tasksOpen[g];
+              renderTasks();
+              runArcs(card);
             });
           });
+          card.querySelectorAll('.tt-title[data-open]').forEach(function (el) {
+            el.addEventListener('click', function () {
+              if (typeof PluginAPI.selectTask === 'function') PluginAPI.selectTask(el.getAttribute('data-open')).catch(function () {});
+            });
+          });
+          card.querySelectorAll('.pip').forEach(function (el) {
+            el.addEventListener('mouseenter', function () {
+              var it = pipData[el.getAttribute('data-pip')];
+              if (!it) return;
+              var h = '<b>' + esc(it.title || t('UNTITLED')) + '</b>';
+              if (it.plan != null) h += '<br>' + esc(t('SUB_PLANNED_ON', { date: fmtShort(it.plan) }));
+              h += '<br>' + esc(it.done ? (it.doneDay != null ? t('DAY_CHECKED_ON', { date: fmtShort(it.doneDay) }) : t('DAY_STATE_DONE_OTHER')) : it.plan != null && it.plan < model.today ? t('DAY_MISSED') : t('NOT_DONE'));
+              var rc = el.getBoundingClientRect();
+              showTip(h, rc.left + rc.width / 2, rc.top);
+            });
+            el.addEventListener('mouseleave', hideTip);
+          });
+        }
+        var pipData = {};
+        function taskTile(r, st, i) {
+          var pct = Math.round(r.ratio * 100);
+          var h = '<div class="tt tt-' + st + '" style="animation-delay:' + Math.min(0.6, i * 0.035).toFixed(3) + 's">';
+          h += '<div class="tt-ring"><svg viewBox="0 0 48 48">' + ringParts({ cx: 24, cy: 24, r: 19, w: 5, ratio: r.ratio, p: C, key: 'tt-' + r.id }) + '</svg><span>' + pct + '<small>%</small></span></div>';
+          h += '<div class="tt-body"><div class="tt-top"><span class="tt-title"' + (r.archived ? '' : ' data-open="' + esc(r.id) + '" title="' + esc(t('OPEN_TASK')) + '"') + '>' + esc(r.title || t('UNTITLED')) + '</span></div>';
+          var meta = [];
+          if (r.planStart != null) meta.push(r.planStart === r.planEnd ? fmtShort(r.planStart) : fmtShort(r.planStart) + ' – ' + fmtShort(r.planEnd));
+          h += '<div class="tt-meta"><span class="tt-num"><b>' + fmtNum(r.done) + '</b>/' + fmtNum(r.total) + '</span>' + (meta.length ? '<span class="tt-sep"></span>' + esc(meta.join(' · ')) : '') + '</div></div>';
+          var badge;
+          if (st === 'done') badge = '✓ ' + t('TASK_DONE');
+          else if (st === 'behind') badge = t('BEHIND', { n: r.dueBefore - r.datedDone });
+          else if (st === 'upcoming') badge = r.planStart != null ? t('STARTS_IN', { n: r.planStart - model.today }) : t('TASKS_UPCOMING');
+          else badge = r.planEnd != null && r.planEnd >= model.today ? t('D_DAY', { n: r.planEnd - model.today }) : t('TASKS_ACTIVE');
+          h += '<span class="tt-badge">' + esc(badge) + '</span>';
+          // one pip per subtask, in planned order
+          h += '<div class="tt-pips' + (r.items.length > 24 ? ' dense' : '') + '">';
+          r.items.forEach(function (it) {
+            var k = 'p' + ++uid;
+            pipData[k] = it;
+            var c = it.done ? 'done' : it.plan != null && it.plan < model.today ? 'missed' : it.plan === model.today ? 'now' : 'todo';
+            h += '<span class="pip ' + c + '" data-pip="' + k + '"></span>';
+          });
+          h += '</div></div>';
+          return h;
         }
 
         // ---------- today ----------

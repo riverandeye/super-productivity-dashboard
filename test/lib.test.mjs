@@ -172,6 +172,8 @@ test('per-project heat, streak and task rows in project order', () => {
   const [p, q] = m.projects;
   assert.deepEqual(p.tasks.map((r) => [r.id, r.done, r.total]), [['b', 1, 1], ['a', 1, 2], ['z', 1, 1]]);
   assert.equal(p.tasks[1].planEnd, D('2026-11-20'));
+  assert.deepEqual(p.tasks[1].items.map((x) => [x.id, x.done]), [['a1', true], ['a2', false]]);
+  assert.equal(p.tasks[1].dueBefore, 1);
   assert.equal(p.tasks[2].archived, true);
   assert.equal(p.heat[D('2026-11-11')], 1);
   assert.equal(p.heat[D('2026-11-01')], undefined, "Q's check is not in P");

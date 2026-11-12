@@ -31,11 +31,15 @@ English, light (demo data):
 
 ## Install
 
-1. Get the ZIP: [`release/goal-dashboard-1.2.0.zip`](https://github.com/riverandeye/super-productivity-dashboard/raw/main/release/goal-dashboard-1.2.0.zip)
+1. Get the ZIP: [`release/aim-dashboard-1.3.0.zip`](https://github.com/riverandeye/super-productivity-dashboard/raw/main/release/aim-dashboard-1.3.0.zip)
    (or build it with `npm run build`; only Node and the system `zip` command are needed).
 2. In the app, open **Settings → Plugins → Install Plugin** (Choose Plugin File) and pick the ZIP.
 3. Confirm the install warning, then **turn the plugin on** with its switch in the plugin list (uploaded plugins
-   start disabled). Uploading a ZIP with the same id (`goal-dashboard`) replaces the plugin.
+   start disabled). Uploading a ZIP with the same id (`aim-dashboard`) replaces the plugin.
+
+Upgrading from 1.2.0 or earlier: the plugin id changed from `goal-dashboard` to `aim-dashboard` in 1.3.0, so
+install the new ZIP and remove the old "Dashboard" (`goal-dashboard`) in Settings → Plugins. Nothing to move
+over: the only setting ("Open the dashboard when the app starts") is on by default.
 
 Open the dashboard from:
 
@@ -43,6 +47,9 @@ Open the dashboard from:
 - the dashboard button in the header (`space_dashboard` icon), and a button on the Today page header,
 - the "Open goal dashboard" shortcut (assign keys in Settings → Keyboard Shortcuts),
 - app start: see [Home screen](#home-screen).
+
+The app lists plugin menu entries in plugin-id order, which is why the id starts with "aim": it puts Dashboard
+first among plugin entries, right after the app's own Today and Schedule.
 
 ## What it shows
 
@@ -77,8 +84,10 @@ Sections, all for the selected project:
 - **Check-in calendar**: GitHub-style heatmap of checks per day. Future days are outlined by how many items are
   planned for them. Click a day to list its items under the calendar: what was checked that day, and what was
   planned for it (done on another day, missed, or still planned). Click it again or × to close.
-- **Tasks**: progress bar per top-level task (e.g. per book), in the project's order, with its planned date range.
-  Click a title to open the task.
+- **Tasks**: one tile per top-level task (e.g. per book), grouped into in progress, upcoming and done. Each tile
+  has a progress ring, done/total, its planned date range, a badge (D-day, "starts in N days", "behind by N" or
+  done) and one dot per subtask in planned order: filled = done, red = planned day passed, outlined = today.
+  Hover a dot for the subtask; click a title to open the task. Upcoming and done show 4 tiles until expanded.
 - **Today**: today's planned leaves with their parent task, and items checked today. Check them off right there
   (`PluginAPI.updateTask(id, { isDone: true })`); clicking a checked item again unchecks it. Click a title to open
   the task details. Overdue items (planned day passed, not done) are listed below.
@@ -115,7 +124,7 @@ patch the app's UI to get around that.
 
 ```
 src/
-  manifest.json   id: goal-dashboard
+  manifest.json   id: aim-dashboard
   plugin.js       header button, shortcut, Today-page button, open on startup
   index.html      dashboard UI (iframe); no external resources
   lib.js          data model, inlined into index.html at build time
