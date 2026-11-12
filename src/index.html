@@ -1,0 +1,2383 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Dashboard</title>
+    <style>
+      :root {
+        --font: var(--font-primary-stack, system-ui, -apple-system, 'Segoe UI', Roboto, 'Apple SD Gothic Neo', sans-serif);
+        --grad: linear-gradient(120deg, #8b5cf6 0%, #22d3ee 55%, #f472b6 100%);
+        --good: #34d399;
+        --bad: #fb7185;
+        --warn: #fbbf24;
+        --r-lg: 22px;
+        --r-md: 14px;
+        --ease: cubic-bezier(0.22, 1, 0.36, 1);
+      }
+      html[data-theme='dark'] {
+        color-scheme: dark;
+        --bg0: #080b16;
+        --bg1: #0d1222;
+        --card: rgba(20, 26, 46, 0.66);
+        --card-solid: #141a2e;
+        --card-hi: rgba(255, 255, 255, 0.045);
+        --line: rgba(255, 255, 255, 0.075);
+        --line-strong: rgba(255, 255, 255, 0.14);
+        --text: #eef1fb;
+        --muted: #8c94b3;
+        --faint: #5a6282;
+        --track: rgba(255, 255, 255, 0.07);
+        --heat0: rgba(255, 255, 255, 0.05);
+        --shadow: 0 20px 50px -20px rgba(0, 0, 0, 0.7), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+        --glow-a: rgba(139, 92, 246, 0.28);
+        --glow-b: rgba(34, 211, 238, 0.18);
+        --glow-c: rgba(244, 114, 182, 0.16);
+      }
+      html[data-theme='light'] {
+        color-scheme: light;
+        --bg0: #f3f5fc;
+        --bg1: #eef1fa;
+        --card: rgba(255, 255, 255, 0.78);
+        --card-solid: #ffffff;
+        --card-hi: rgba(20, 30, 70, 0.03);
+        --line: rgba(20, 30, 70, 0.08);
+        --line-strong: rgba(20, 30, 70, 0.16);
+        --text: #141a2f;
+        --muted: #5b6488;
+        --faint: #9aa2c0;
+        --track: rgba(20, 30, 70, 0.07);
+        --heat0: rgba(20, 30, 70, 0.06);
+        --shadow: 0 18px 40px -22px rgba(40, 50, 110, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.7);
+        --glow-a: rgba(139, 92, 246, 0.16);
+        --glow-b: rgba(34, 211, 238, 0.14);
+        --glow-c: rgba(244, 114, 182, 0.12);
+      }
+      * {
+        box-sizing: border-box;
+      }
+      html,
+      body {
+        margin: 0;
+        min-height: 100%;
+      }
+      body {
+        background: var(--bg0) !important;
+        color: var(--text) !important;
+        font-family: var(--font) !important;
+        font-size: 14px;
+        line-height: 1.45;
+        -webkit-font-smoothing: antialiased;
+        overflow-x: hidden;
+      }
+      button {
+        font: inherit;
+        color: inherit;
+      }
+
+      /* ---------- aurora background ---------- */
+      .aurora {
+        position: fixed;
+        inset: 0;
+        z-index: 0;
+        pointer-events: none;
+        overflow: hidden;
+        background: radial-gradient(1200px 600px at 50% -10%, var(--bg1), transparent 70%);
+      }
+      .aurora i {
+        position: absolute;
+        width: 60vmax;
+        height: 60vmax;
+        border-radius: 50%;
+        filter: blur(70px);
+        opacity: 0.9;
+        animation: drift 26s ease-in-out infinite alternate;
+      }
+      .aurora i:nth-child(1) {
+        left: -18vmax;
+        top: -26vmax;
+        background: radial-gradient(circle, var(--glow-a), transparent 65%);
+      }
+      .aurora i:nth-child(2) {
+        right: -22vmax;
+        top: -10vmax;
+        background: radial-gradient(circle, var(--glow-b), transparent 65%);
+        animation-duration: 32s;
+        animation-delay: -8s;
+      }
+      .aurora i:nth-child(3) {
+        left: 20vw;
+        bottom: -40vmax;
+        background: radial-gradient(circle, var(--glow-c), transparent 65%);
+        animation-duration: 38s;
+        animation-delay: -16s;
+      }
+      @keyframes drift {
+        0% {
+          transform: translate3d(0, 0, 0) scale(1);
+        }
+        50% {
+          transform: translate3d(6vmax, 4vmax, 0) scale(1.12);
+        }
+        100% {
+          transform: translate3d(-4vmax, 7vmax, 0) scale(0.95);
+        }
+      }
+      .grain {
+        position: fixed;
+        inset: 0;
+        z-index: 0;
+        pointer-events: none;
+        opacity: 0.035;
+        background-image: radial-gradient(rgba(255, 255, 255, 0.9) 1px, transparent 1px);
+        background-size: 3px 3px;
+      }
+      html[data-theme='light'] .grain {
+        opacity: 0.025;
+        background-image: radial-gradient(rgba(0, 0, 40, 0.9) 1px, transparent 1px);
+      }
+
+      /* ---------- layout ---------- */
+      .wrap {
+        position: relative;
+        z-index: 1;
+        max-width: 1480px;
+        margin: 0 auto;
+        padding: 28px 28px 48px;
+      }
+      .card {
+        position: relative;
+        background: var(--card);
+        border: 1px solid var(--line);
+        border-radius: var(--r-lg);
+        box-shadow: var(--shadow);
+        backdrop-filter: blur(18px) saturate(140%);
+        -webkit-backdrop-filter: blur(18px) saturate(140%);
+        padding: 22px;
+      }
+      .card::before {
+        /* hairline gradient rim */
+        content: '';
+        position: absolute;
+        inset: -1px;
+        border-radius: inherit;
+        padding: 1px;
+        background: linear-gradient(160deg, rgba(255, 255, 255, 0.16), transparent 30%, transparent 70%, rgba(139, 92, 246, 0.25));
+        -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+        -webkit-mask-composite: xor;
+        mask-composite: exclude;
+        pointer-events: none;
+      }
+      html[data-theme='light'] .card::before {
+        background: linear-gradient(160deg, rgba(255, 255, 255, 0.9), transparent 30%, transparent 70%, rgba(139, 92, 246, 0.2));
+      }
+      .sec-head {
+        display: flex;
+        align-items: baseline;
+        gap: 10px;
+        margin: 0 0 16px;
+      }
+      .sec-head h2 {
+        margin: 0;
+        font-size: 17px;
+        font-weight: 750;
+        letter-spacing: -0.01em;
+      }
+      .sec-head .sub {
+        color: var(--muted);
+        font-size: 12.5px;
+      }
+      .sec-head .grow {
+        flex: 1;
+      }
+      .grid {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) 390px;
+        gap: 22px;
+        margin-top: 22px;
+        align-items: start;
+      }
+      .col {
+        display: flex;
+        flex-direction: column;
+        gap: 22px;
+        min-width: 0;
+      }
+      @media (max-width: 1180px) {
+        .grid {
+          grid-template-columns: minmax(0, 1fr);
+        }
+      }
+
+      /* ---------- reveal animation ---------- */
+      .rise {
+        opacity: 0;
+        transform: translateY(14px) scale(0.99);
+        animation: rise 0.8s var(--ease) forwards;
+      }
+      @keyframes rise {
+        to {
+          opacity: 1;
+          transform: none;
+        }
+      }
+
+      /* ---------- hero ---------- */
+      .hero {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) auto;
+        gap: 28px;
+        align-items: center;
+        padding: 30px 34px;
+        overflow: hidden;
+      }
+      .hero::after {
+        content: '';
+        position: absolute;
+        right: -120px;
+        top: -160px;
+        width: 520px;
+        height: 520px;
+        border-radius: 50%;
+        background: conic-gradient(from 0deg, rgba(139, 92, 246, 0.0), rgba(139, 92, 246, 0.18), rgba(34, 211, 238, 0.14), rgba(244, 114, 182, 0.12), rgba(139, 92, 246, 0));
+        filter: blur(40px);
+        animation: spin 24s linear infinite;
+        pointer-events: none;
+      }
+      @keyframes spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+      .eyebrow {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 12px;
+        font-weight: 700;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        color: var(--muted);
+      }
+      .eyebrow .dot {
+        width: 7px;
+        height: 7px;
+        border-radius: 50%;
+        background: #22d3ee;
+        box-shadow: 0 0 0 0 rgba(34, 211, 238, 0.6);
+        animation: ping 2.2s ease-out infinite;
+      }
+      @keyframes ping {
+        0% {
+          box-shadow: 0 0 0 0 rgba(34, 211, 238, 0.55);
+        }
+        80%,
+        100% {
+          box-shadow: 0 0 0 10px rgba(34, 211, 238, 0);
+        }
+      }
+      .greet {
+        margin: 10px 0 6px;
+        font-size: clamp(28px, 3.4vw, 44px);
+        font-weight: 800;
+        letter-spacing: -0.03em;
+        line-height: 1.1;
+      }
+      .grad-text {
+        background: var(--grad);
+        background-size: 200% 100%;
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+        animation: sheen 8s ease-in-out infinite alternate;
+      }
+      @keyframes sheen {
+        to {
+          background-position: 100% 0;
+        }
+      }
+      .hero-sub {
+        margin: 0;
+        color: var(--muted);
+        font-size: 15px;
+      }
+      .hero-sub b {
+        color: var(--text);
+      }
+      .kpis {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 12px;
+        margin-top: 24px;
+      }
+      @media (max-width: 900px) {
+        .kpis {
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+        .hero {
+          grid-template-columns: minmax(0, 1fr);
+        }
+        .hero-rings {
+          justify-self: center;
+        }
+      }
+      .kpi {
+        position: relative;
+        padding: 14px 16px 13px;
+        border-radius: var(--r-md);
+        background: var(--card-hi);
+        border: 1px solid var(--line);
+        overflow: hidden;
+        transition: transform 0.3s var(--ease), border-color 0.3s;
+      }
+      .kpi:hover {
+        transform: translateY(-2px);
+        border-color: var(--line-strong);
+      }
+      .kpi .lbl {
+        font-size: 11.5px;
+        font-weight: 650;
+        color: var(--muted);
+        letter-spacing: 0.02em;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+      }
+      .kpi .val {
+        margin-top: 4px;
+        font-size: 30px;
+        font-weight: 800;
+        letter-spacing: -0.03em;
+        font-variant-numeric: tabular-nums;
+        line-height: 1.1;
+        white-space: nowrap;
+      }
+      .kpi .val small {
+        font-size: 14px;
+        font-weight: 700;
+        color: var(--muted);
+        margin-left: 3px;
+        letter-spacing: 0;
+      }
+      .kpi .hint {
+        margin-top: 3px;
+        font-size: 12px;
+        color: var(--muted);
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+      .kpi .bar {
+        position: absolute;
+        left: 0;
+        bottom: 0;
+        height: 3px;
+        width: 100%;
+        background: var(--grad);
+        transform-origin: left;
+        transform: scaleX(0);
+        transition: transform 1.4s var(--ease);
+        opacity: 0.85;
+      }
+      .kpi.k-today .val {
+        background: linear-gradient(120deg, #22d3ee, #a78bfa);
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+      }
+      .flame {
+        display: inline-block;
+        transform-origin: 50% 90%;
+        animation: flicker 1.6s ease-in-out infinite alternate;
+      }
+      @keyframes flicker {
+        0% {
+          transform: scale(1) rotate(-3deg);
+        }
+        100% {
+          transform: scale(1.12) rotate(3deg);
+        }
+      }
+      .flame.off {
+        animation: none;
+        filter: grayscale(1);
+        opacity: 0.45;
+      }
+
+      /* ---------- hero rings ---------- */
+      .hero-rings {
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 12px;
+        z-index: 1;
+      }
+      .rings-box {
+        position: relative;
+        width: 280px;
+        height: 280px;
+      }
+      .rings-box svg {
+        width: 100%;
+        height: 100%;
+        overflow: visible;
+      }
+      .rings-center {
+        position: absolute;
+        inset: 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        pointer-events: none;
+      }
+      .rings-center .big {
+        font-size: 44px;
+        font-weight: 850;
+        letter-spacing: -0.04em;
+        font-variant-numeric: tabular-nums;
+        line-height: 1;
+      }
+      .rings-center .big small {
+        font-size: 20px;
+        font-weight: 750;
+        margin-left: 1px;
+      }
+      .rings-center .cap {
+        margin-top: 6px;
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        color: var(--muted);
+      }
+      .rings-center .gain {
+        margin-top: 6px;
+        font-size: 12px;
+        font-weight: 700;
+        color: #22d3ee;
+      }
+      .ring-legend {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 4px 12px;
+        max-width: 320px;
+        font-size: 11.5px;
+        color: var(--muted);
+      }
+      .ring-legend span {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        white-space: nowrap;
+      }
+      .ring-legend i {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+      }
+      .arc {
+        transition: stroke-dashoffset 1.6s var(--ease);
+      }
+      .arc-ghost {
+        animation: breathe 2.4s ease-in-out infinite;
+      }
+      @keyframes breathe {
+        0%,
+        100% {
+          opacity: 0.25;
+        }
+        50% {
+          opacity: 0.7;
+        }
+      }
+
+      /* ---------- project cards ---------- */
+      .pgrid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
+        gap: 16px;
+      }
+      .pcard {
+        position: relative;
+        display: grid;
+        grid-template-columns: 116px minmax(0, 1fr);
+        gap: 16px;
+        align-items: center;
+        padding: 18px;
+        border-radius: 18px;
+        background: var(--card-hi);
+        border: 1px solid var(--line);
+        overflow: hidden;
+        transition: transform 0.35s var(--ease), border-color 0.35s, box-shadow 0.35s;
+      }
+      .pcard::after {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background: radial-gradient(260px 140px at 0% 0%, var(--pc-soft), transparent 70%);
+        pointer-events: none;
+      }
+      .pcard:hover {
+        transform: translateY(-3px);
+        border-color: var(--pc-line);
+        box-shadow: 0 18px 40px -22px var(--pc-glow);
+      }
+      .pring {
+        position: relative;
+        width: 116px;
+        height: 116px;
+        z-index: 1;
+      }
+      .pring svg {
+        width: 100%;
+        height: 100%;
+        overflow: visible;
+      }
+      .pring .pct {
+        position: absolute;
+        inset: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 24px;
+        font-weight: 850;
+        letter-spacing: -0.03em;
+        font-variant-numeric: tabular-nums;
+      }
+      .pring .pct small {
+        font-size: 12px;
+        margin-left: 1px;
+        font-weight: 750;
+        opacity: 0.75;
+      }
+      .pbody {
+        position: relative;
+        z-index: 1;
+        min-width: 0;
+      }
+      .ptitle {
+        display: flex;
+        align-items: flex-start;
+        gap: 8px;
+        font-size: 15.5px;
+        font-weight: 750;
+        letter-spacing: -0.01em;
+        line-height: 1.25;
+      }
+      .ptitle span:first-child {
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+      }
+      .ptitle .dday {
+        flex: none;
+        margin-left: auto;
+        padding: 2px 8px;
+        border-radius: 999px;
+        font-size: 11px;
+        font-weight: 800;
+        color: #fff;
+        background: var(--pc);
+        box-shadow: 0 4px 14px -4px var(--pc-glow);
+        font-variant-numeric: tabular-nums;
+      }
+      .pmeta {
+        margin-top: 8px;
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+        font-size: 12.5px;
+        color: var(--muted);
+      }
+      .pmeta .row {
+        display: flex;
+        align-items: flex-start;
+        gap: 7px;
+      }
+      .pmeta .row .ico {
+        margin-top: 2px;
+      }
+      .pmeta .row b {
+        color: var(--text);
+        font-weight: 700;
+        font-variant-numeric: tabular-nums;
+      }
+      .ico {
+        width: 14px;
+        height: 14px;
+        flex: none;
+        opacity: 0.8;
+      }
+      .chips {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+        margin-top: 10px;
+      }
+      .chip {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        padding: 3px 9px;
+        border-radius: 999px;
+        font-size: 11.5px;
+        font-weight: 700;
+        white-space: nowrap;
+        border: 1px solid var(--line);
+        background: var(--card-hi);
+        font-variant-numeric: tabular-nums;
+      }
+      .chip.today {
+        border-color: transparent;
+        color: #fff;
+        background: linear-gradient(120deg, #7c3aed, #0891b2);
+        box-shadow: 0 6px 16px -8px rgba(34, 211, 238, 0.8);
+      }
+      .chip.gained {
+        color: var(--good);
+        border-color: rgba(52, 211, 153, 0.35);
+        background: rgba(52, 211, 153, 0.1);
+      }
+      .chip.ahead {
+        color: var(--good);
+        border-color: rgba(52, 211, 153, 0.35);
+        background: rgba(52, 211, 153, 0.1);
+      }
+      .chip.behind {
+        color: var(--bad);
+        border-color: rgba(251, 113, 133, 0.35);
+        background: rgba(251, 113, 133, 0.1);
+      }
+      .chip.track {
+        color: #67e8f9;
+        border-color: rgba(34, 211, 238, 0.3);
+        background: rgba(34, 211, 238, 0.08);
+      }
+      html[data-theme='light'] .chip.track {
+        color: #0e7490;
+      }
+      html[data-theme='light'] .chip.ahead,
+      html[data-theme='light'] .chip.gained {
+        color: #059669;
+      }
+      html[data-theme='light'] .chip.behind {
+        color: #e11d48;
+      }
+      .chip.muted {
+        color: var(--muted);
+      }
+
+      /* ---------- burndown ---------- */
+      .bd-tabs {
+        display: flex;
+        gap: 6px;
+        flex-wrap: wrap;
+      }
+      .bd-tab {
+        border: 1px solid var(--line);
+        background: transparent;
+        padding: 5px 12px;
+        border-radius: 999px;
+        cursor: pointer;
+        font-size: 12px;
+        font-weight: 700;
+        color: var(--muted);
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        transition: all 0.25s var(--ease);
+      }
+      .bd-tab i {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+      }
+      .bd-tab.on {
+        color: var(--text);
+        border-color: var(--line-strong);
+        background: var(--card-hi);
+      }
+      .bd-wrap {
+        position: relative;
+      }
+      .bd-wrap svg {
+        display: block;
+        overflow: visible;
+      }
+      .bd-axis text {
+        fill: var(--faint);
+        font-size: 11px;
+        font-family: var(--font);
+      }
+      .bd-grid line {
+        stroke: var(--line);
+      }
+      .bd-plan {
+        fill: none;
+        stroke-width: 2;
+        stroke-dasharray: 6 6;
+        opacity: 0.85;
+      }
+      .bd-actual {
+        fill: none;
+        stroke-width: 3;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+      }
+      .bd-proj {
+        fill: none;
+        stroke-width: 2;
+        stroke-dasharray: 2 6;
+        stroke-linecap: round;
+      }
+      .draw {
+        stroke-dasharray: var(--len);
+        stroke-dashoffset: var(--len);
+        animation: draw 1.8s var(--ease) forwards;
+      }
+      @keyframes draw {
+        to {
+          stroke-dashoffset: 0;
+        }
+      }
+      .fade-in {
+        opacity: 0;
+        animation: fadein 1.2s 0.4s var(--ease) forwards;
+      }
+      @keyframes fadein {
+        to {
+          opacity: 1;
+        }
+      }
+      .legend {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px 16px;
+        margin-top: 10px;
+        font-size: 12px;
+        color: var(--muted);
+      }
+      .legend span {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+      }
+      .legend svg {
+        width: 22px;
+        height: 8px;
+      }
+      .bd-stats {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 10px;
+        margin-bottom: 14px;
+      }
+      .bd-stat {
+        padding: 10px 12px;
+        border-radius: 12px;
+        background: var(--card-hi);
+        border: 1px solid var(--line);
+      }
+      .bd-stat .l {
+        font-size: 11px;
+        color: var(--muted);
+        font-weight: 650;
+      }
+      .bd-stat .v {
+        font-size: 16px;
+        font-weight: 800;
+        letter-spacing: -0.01em;
+        margin-top: 2px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+      .bd-stat .v.good {
+        color: var(--good);
+      }
+      .bd-stat .v.bad {
+        color: var(--bad);
+      }
+
+      /* ---------- heatmap ---------- */
+      .hm-scroll {
+        overflow-x: auto;
+        padding-bottom: 4px;
+      }
+      .hm {
+        display: grid;
+        grid-auto-flow: column;
+        grid-template-rows: 16px repeat(7, var(--cell, 14px));
+        grid-auto-columns: var(--cell, 14px);
+        gap: 4px;
+        width: max-content;
+        position: relative;
+      }
+      .hm .mlabel {
+        grid-row: 1;
+        font-size: 10.5px;
+        color: var(--faint);
+        white-space: nowrap;
+        line-height: 14px;
+      }
+      .hm .dlabel {
+        font-size: 10px;
+        color: var(--faint);
+        line-height: var(--cell, 14px);
+        padding-right: 4px;
+        text-align: right;
+      }
+      .cell {
+        width: var(--cell, 14px);
+        height: var(--cell, 14px);
+        border-radius: calc(var(--cell, 14px) * 0.28);
+        background: var(--heat0);
+        transform: scale(0.2);
+        opacity: 0;
+        animation: pop 0.5s var(--ease) forwards;
+        transition: transform 0.15s;
+      }
+      .cell:hover {
+        transform: scale(1.35) !important;
+        z-index: 2;
+      }
+      @keyframes pop {
+        to {
+          transform: scale(1);
+          opacity: 1;
+        }
+      }
+      .cell.l1 {
+        background: rgba(139, 92, 246, 0.38);
+      }
+      .cell.l2 {
+        background: rgba(139, 92, 246, 0.68);
+      }
+      .cell.l3 {
+        background: #8b5cf6;
+        box-shadow: 0 0 10px -2px rgba(139, 92, 246, 0.8);
+      }
+      .cell.l4 {
+        background: linear-gradient(135deg, #a78bfa, #22d3ee);
+        box-shadow: 0 0 12px -2px rgba(34, 211, 238, 0.9);
+      }
+      .cell.future {
+        background: transparent;
+        box-shadow: inset 0 0 0 1px var(--line);
+      }
+      .cell.p1 {
+        box-shadow: inset 0 0 0 1.5px rgba(34, 211, 238, 0.35);
+      }
+      .cell.p2 {
+        box-shadow: inset 0 0 0 1.5px rgba(34, 211, 238, 0.6);
+        background: rgba(34, 211, 238, 0.06);
+      }
+      .cell.p3 {
+        box-shadow: inset 0 0 0 1.5px rgba(34, 211, 238, 0.9);
+        background: rgba(34, 211, 238, 0.12);
+      }
+      .cell.today {
+        outline: 2px solid #f472b6;
+        outline-offset: 1px;
+      }
+      .hm-legend {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        margin-top: 12px;
+        font-size: 11px;
+        color: var(--muted);
+        flex-wrap: wrap;
+      }
+      .hm-legend .cell {
+        animation: none;
+        opacity: 1;
+        transform: none;
+        width: 12px;
+        height: 12px;
+      }
+      .hm-legend .sp {
+        width: 14px;
+      }
+
+      /* ---------- today panel ---------- */
+      .today-card {
+        position: sticky;
+        top: 16px;
+      }
+      .today-head {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        margin-bottom: 14px;
+      }
+      .today-head h2 {
+        margin: 0;
+        font-size: 19px;
+        font-weight: 800;
+        letter-spacing: -0.02em;
+      }
+      .today-head .date {
+        color: var(--muted);
+        font-size: 12.5px;
+      }
+      .mini-ring {
+        width: 52px;
+        height: 52px;
+        flex: none;
+        position: relative;
+      }
+      .mini-ring svg {
+        width: 100%;
+        height: 100%;
+      }
+      .mini-ring b {
+        position: absolute;
+        inset: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 12px;
+        font-weight: 800;
+        font-variant-numeric: tabular-nums;
+      }
+      .today-pts {
+        margin-left: auto;
+        text-align: right;
+      }
+      .today-pts .v {
+        font-size: 22px;
+        font-weight: 850;
+        letter-spacing: -0.03em;
+        font-variant-numeric: tabular-nums;
+      }
+      .today-pts .l {
+        font-size: 11px;
+        color: var(--muted);
+        font-weight: 650;
+      }
+      .tlist {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+      }
+      .titem {
+        position: relative;
+        display: grid;
+        grid-template-columns: 30px minmax(0, 1fr) auto;
+        gap: 10px;
+        align-items: center;
+        padding: 11px 12px 11px 10px;
+        border-radius: 14px;
+        background: var(--card-hi);
+        border: 1px solid var(--line);
+        transition: transform 0.3s var(--ease), border-color 0.3s, background 0.3s, opacity 0.4s;
+        overflow: hidden;
+      }
+      .titem::before {
+        content: '';
+        position: absolute;
+        left: 0;
+        top: 10px;
+        bottom: 10px;
+        width: 3px;
+        border-radius: 0 3px 3px 0;
+        background: var(--pc);
+        box-shadow: 0 0 10px var(--pc);
+      }
+      .titem:hover {
+        transform: translateX(2px);
+        border-color: var(--line-strong);
+      }
+      .titem.done {
+        opacity: 0.62;
+      }
+      .titem.done .ttitle {
+        text-decoration: line-through;
+        text-decoration-color: var(--faint);
+      }
+      .titem .sweep {
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(90deg, transparent, var(--pc-soft), transparent);
+        transform: translateX(-100%);
+        pointer-events: none;
+      }
+      .titem.just .sweep {
+        animation: sweep 0.9s var(--ease);
+      }
+      @keyframes sweep {
+        to {
+          transform: translateX(100%);
+        }
+      }
+      .check {
+        width: 26px;
+        height: 26px;
+        border-radius: 50%;
+        border: 2px solid var(--line-strong);
+        background: transparent;
+        padding: 0;
+        cursor: pointer;
+        display: grid;
+        place-items: center;
+        transition: all 0.3s var(--ease);
+        position: relative;
+      }
+      .check:hover {
+        border-color: var(--pc);
+        box-shadow: 0 0 0 4px var(--pc-soft);
+      }
+      .check svg {
+        width: 14px;
+        height: 14px;
+        stroke: #fff;
+        stroke-width: 3;
+        fill: none;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+        stroke-dasharray: 20;
+        stroke-dashoffset: 20;
+        transition: stroke-dashoffset 0.35s 0.08s var(--ease);
+      }
+      .check.on {
+        border-color: transparent;
+        background: linear-gradient(135deg, var(--pc), var(--pc2));
+        box-shadow: 0 6px 16px -6px var(--pc-glow);
+      }
+      .check.on svg {
+        stroke-dashoffset: 0;
+      }
+      .check:disabled {
+        cursor: progress;
+      }
+      .tmain {
+        min-width: 0;
+      }
+      .ttitle {
+        font-weight: 650;
+        font-size: 13.5px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        cursor: pointer;
+      }
+      .ttitle:hover {
+        text-decoration: underline;
+        text-decoration-color: var(--faint);
+      }
+      .tsub {
+        margin-top: 2px;
+        font-size: 11.5px;
+        color: var(--muted);
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+      .tsub .pdot {
+        display: inline-block;
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        background: var(--pc);
+        margin-right: 5px;
+        vertical-align: 1px;
+      }
+      .tpts {
+        font-size: 12px;
+        font-weight: 800;
+        color: var(--muted);
+        font-variant-numeric: tabular-nums;
+        white-space: nowrap;
+      }
+      .titem:not(.done) .tpts {
+        color: #67e8f9;
+      }
+      html[data-theme='light'] .titem:not(.done) .tpts {
+        color: #0e7490;
+      }
+      .tpts.late {
+        color: var(--bad) !important;
+      }
+      .empty {
+        padding: 26px 10px;
+        text-align: center;
+        color: var(--muted);
+        font-size: 13px;
+      }
+      .empty .big {
+        font-size: 34px;
+        display: block;
+        margin-bottom: 6px;
+      }
+      .alldone {
+        margin: 0 0 12px;
+        padding: 12px 14px;
+        border-radius: 14px;
+        background: linear-gradient(120deg, rgba(52, 211, 153, 0.16), rgba(34, 211, 238, 0.12));
+        border: 1px solid rgba(52, 211, 153, 0.35);
+        font-weight: 750;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+      .sub-head {
+        margin: 18px 0 10px;
+        display: flex;
+        align-items: baseline;
+        gap: 8px;
+        font-size: 13px;
+        font-weight: 800;
+        color: var(--bad);
+      }
+      .sub-head span {
+        font-weight: 600;
+        color: var(--muted);
+        font-size: 11.5px;
+      }
+
+      .more {
+        margin-top: 10px;
+        width: 100%;
+        padding: 8px;
+        border-radius: 12px;
+        border: 1px dashed var(--line-strong);
+        background: transparent;
+        color: var(--muted);
+        font-size: 12px;
+        font-weight: 700;
+        cursor: pointer;
+      }
+      .more:hover {
+        color: var(--text);
+        border-color: var(--muted);
+      }
+
+      /* ---------- pace card ---------- */
+      .pace-big {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+      }
+      .pace-big .num {
+        font-size: 40px;
+        font-weight: 850;
+        letter-spacing: -0.04em;
+        font-variant-numeric: tabular-nums;
+        line-height: 1;
+      }
+      .pace-big .num.good {
+        color: var(--good);
+      }
+      .pace-big .num.bad {
+        color: var(--bad);
+      }
+      .pace-big .num.flat {
+        color: #67e8f9;
+      }
+      .pace-big .txt {
+        font-weight: 700;
+      }
+      .pace-big .txt div:last-child {
+        color: var(--muted);
+        font-size: 12px;
+        font-weight: 500;
+        margin-top: 2px;
+      }
+      .pace-rows {
+        margin-top: 16px;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+      }
+      .pace-row .top {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 12.5px;
+        font-weight: 700;
+      }
+      .pace-row .top .grow {
+        flex: 1;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+      .pace-track {
+        position: relative;
+        margin-top: 7px;
+        height: 8px;
+        border-radius: 99px;
+        background: var(--track);
+        overflow: visible;
+      }
+      .pace-track .fill {
+        position: absolute;
+        left: 0;
+        top: 0;
+        bottom: 0;
+        border-radius: 99px;
+        background: linear-gradient(90deg, var(--pc), var(--pc2));
+        box-shadow: 0 0 12px -2px var(--pc-glow);
+        width: 0;
+        transition: width 1.4s var(--ease);
+      }
+      .pace-track .mark {
+        position: absolute;
+        top: -4px;
+        bottom: -4px;
+        width: 2px;
+        border-radius: 2px;
+        background: var(--text);
+        opacity: 0.8;
+        transition: left 1.4s var(--ease);
+      }
+      .pace-row .bot {
+        margin-top: 6px;
+        display: flex;
+        justify-content: space-between;
+        font-size: 11.5px;
+        color: var(--muted);
+        gap: 8px;
+      }
+
+      /* ---------- misc ---------- */
+      .tip {
+        position: fixed;
+        z-index: 50;
+        pointer-events: none;
+        padding: 8px 11px;
+        border-radius: 10px;
+        background: var(--card-solid);
+        border: 1px solid var(--line-strong);
+        box-shadow: 0 12px 30px -10px rgba(0, 0, 0, 0.5);
+        font-size: 12px;
+        line-height: 1.5;
+        white-space: nowrap;
+        opacity: 0;
+        transform: translateY(4px);
+        transition: opacity 0.15s, transform 0.15s;
+      }
+      .tip.on {
+        opacity: 1;
+        transform: none;
+      }
+      .tip b {
+        font-weight: 800;
+      }
+      #confetti {
+        position: fixed;
+        inset: 0;
+        width: 100vw;
+        height: 100vh;
+        pointer-events: none;
+        z-index: 40;
+      }
+      .err {
+        display: none;
+        margin-bottom: 16px;
+        padding: 12px 16px;
+        border-radius: 12px;
+        color: #fff;
+        background: #be123c;
+      }
+      .foot {
+        margin-top: 26px;
+        display: flex;
+        justify-content: center;
+        color: var(--muted);
+        font-size: 12px;
+      }
+      .switch {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        cursor: pointer;
+        user-select: none;
+      }
+      .switch input {
+        position: absolute;
+        opacity: 0;
+        pointer-events: none;
+      }
+      .switch .knob {
+        width: 34px;
+        height: 20px;
+        border-radius: 99px;
+        background: var(--track);
+        border: 1px solid var(--line-strong);
+        position: relative;
+        transition: background 0.25s;
+      }
+      .switch .knob::after {
+        content: '';
+        position: absolute;
+        top: 2px;
+        left: 2px;
+        width: 14px;
+        height: 14px;
+        border-radius: 50%;
+        background: var(--muted);
+        transition: transform 0.25s var(--ease), background 0.25s;
+      }
+      .switch input:checked + .knob {
+        background: linear-gradient(120deg, #7c3aed, #0891b2);
+        border-color: transparent;
+      }
+      .switch input:checked + .knob::after {
+        transform: translateX(14px);
+        background: #fff;
+      }
+      .switch input:focus-visible + .knob {
+        outline: 2px solid #22d3ee;
+        outline-offset: 2px;
+      }
+      @media (prefers-reduced-motion: reduce) {
+        *,
+        *::before,
+        *::after {
+          animation-duration: 0.001s !important;
+          animation-iteration-count: 1 !important;
+          transition-duration: 0.001s !important;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="aurora"><i></i><i></i><i></i></div>
+    <div class="grain"></div>
+    <canvas id="confetti"></canvas>
+    <div class="tip" id="tip"></div>
+
+    <main class="wrap">
+      <div class="err" id="err"></div>
+      <section class="card hero rise" id="hero"></section>
+      <div class="grid">
+        <div class="col">
+          <section class="card rise" style="animation-delay: 0.08s">
+            <div class="sec-head"><h2 data-i18n="PROJECTS"></h2><span class="sub" id="projSub"></span></div>
+            <div class="pgrid" id="projects"></div>
+          </section>
+          <section class="card rise" style="animation-delay: 0.16s" id="burndownCard"></section>
+          <section class="card rise" style="animation-delay: 0.24s" id="heatCard"></section>
+        </div>
+        <div class="col">
+          <section class="card today-card rise" style="animation-delay: 0.12s" id="todayCard"></section>
+          <section class="card rise" style="animation-delay: 0.2s" id="paceCard"></section>
+        </div>
+      </div>
+      <div class="foot">
+        <label class="switch"><input type="checkbox" id="startup" /><span class="knob"></span><span data-i18n="OPEN_ON_STARTUP"></span></label>
+      </div>
+    </main>
+
+    <!-- @inline lib.js -->
+    <script>
+      (function () {
+        'use strict';
+        var L = window.DashLib;
+        var SETTINGS_KEY = 'settings';
+        var UI_KEY = 'sp-dashboard-ui';
+        var model = null;
+        var lastSig = '';
+        var dayOffsetMs = 0;
+        var prevVals = {}; // count-up / ring start values, keyed
+        var pending = {}; // task id -> desired isDone, while an update is in flight
+        var justChecked = {};
+        var firstRender = true;
+        var ui = loadUi();
+
+        var $ = function (id) {
+          return document.getElementById(id);
+        };
+        var $tip = $('tip');
+        var $err = $('err');
+
+        function loadUi() {
+          var d = { burndown: null };
+          try {
+            var s = JSON.parse(localStorage.getItem(UI_KEY) || 'null');
+            if (s && typeof s.burndown === 'string') d.burndown = s.burndown;
+          } catch (e) {}
+          return d;
+        }
+        function saveUi() {
+          try {
+            localStorage.setItem(UI_KEY, JSON.stringify(ui));
+          } catch (e) {}
+        }
+
+        // ---------- i18n ----------
+        // Strings come from src/i18n/*.json, inlined at build time, so the iframe
+        // can translate synchronously. The language follows the app.
+        var I18N = /* @inline i18n */ { en: {} };
+        var lang = 'en';
+        var appLang = 'en';
+        var fmtCache = {};
+        function pickLang(code) {
+          code = String(code || 'en').toLowerCase();
+          if (I18N[code]) return code;
+          var base = code.split(/[-_]/)[0];
+          return I18N[base] ? base : 'en';
+        }
+        function t(key, params) {
+          if (params && params.n === 1 && hasKey(key + '_ONE')) key = key + '_ONE';
+          var s = (I18N[lang] && I18N[lang][key]) || I18N.en[key] || key;
+          if (params) {
+            s = s.replace(/\{\{\s*(\w+)\s*\}\}/g, function (m, k) {
+              return k in params ? String(params[k]) : m;
+            });
+          }
+          return s;
+        }
+        function hasKey(k) {
+          return !!((I18N[lang] && I18N[lang][k]) || I18N.en[k]);
+        }
+        function applyStaticI18n() {
+          document.documentElement.lang = lang;
+          document.querySelectorAll('[data-i18n]').forEach(function (e) {
+            e.textContent = t(e.getAttribute('data-i18n'));
+          });
+        }
+        async function loadLanguage() {
+          var code = 'en';
+          try {
+            if (typeof PluginAPI.getCurrentLanguage === 'function') code = await PluginAPI.getCurrentLanguage();
+          } catch (e) {}
+          appLang = code || 'en';
+          lang = pickLang(appLang);
+          fmtCache = {};
+          applyStaticI18n();
+        }
+        function dfmt(opts, n) {
+          var k = JSON.stringify(opts);
+          if (!fmtCache[k]) {
+            var o = Object.assign({ timeZone: 'UTC' }, opts);
+            try {
+              fmtCache[k] = new Intl.DateTimeFormat(appLang, o);
+            } catch (e) {
+              fmtCache[k] = new Intl.DateTimeFormat('en', o);
+            }
+          }
+          return fmtCache[k].format(new Date(n * L.DAY_MS));
+        }
+        var fmtLong = function (n) {
+          return dfmt({ year: 'numeric', month: 'short', day: 'numeric' }, n);
+        };
+        var fmtShort = function (n) {
+          return dfmt({ month: 'short', day: 'numeric' }, n);
+        };
+        var fmtNum = function (n, dec) {
+          try {
+            return new Intl.NumberFormat(appLang, { minimumFractionDigits: dec || 0, maximumFractionDigits: dec || 0 }).format(n);
+          } catch (e) {
+            return n.toFixed(dec || 0);
+          }
+        };
+        function pts(n) {
+          return fmtNum(n, n > 0 && n < 10 ? 2 : 1);
+        }
+
+        // ---------- theme ----------
+        function applyTheme() {
+          var v = getComputedStyle(document.documentElement).getPropertyValue('--is-dark-theme').trim();
+          document.documentElement.setAttribute('data-theme', v === '0' ? 'light' : 'dark');
+        }
+        applyTheme();
+        new MutationObserver(applyTheme).observe(document.head, { childList: true, subtree: true, characterData: true });
+
+        // ---------- colors ----------
+        function parseColor(c) {
+          if (!c) return null;
+          var m = /^#([0-9a-f]{3}|[0-9a-f]{6})$/i.exec(c.trim());
+          if (m) {
+            var h = m[1].length === 3 ? m[1].replace(/./g, '$&$&') : m[1];
+            return [parseInt(h.slice(0, 2), 16), parseInt(h.slice(2, 4), 16), parseInt(h.slice(4, 6), 16)];
+          }
+          m = /rgba?\(\s*(\d+)[ ,]+(\d+)[ ,]+(\d+)/i.exec(c);
+          return m ? [+m[1], +m[2], +m[3]] : null;
+        }
+        function rgbToHsl(r, g, b) {
+          r /= 255;
+          g /= 255;
+          b /= 255;
+          var max = Math.max(r, g, b),
+            min = Math.min(r, g, b),
+            h = 0,
+            s = 0,
+            l = (max + min) / 2;
+          if (max !== min) {
+            var d = max - min;
+            s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+            h = max === r ? (g - b) / d + (g < b ? 6 : 0) : max === g ? (b - r) / d + 2 : (r - g) / d + 4;
+            h *= 60;
+          }
+          return [h, s * 100, l * 100];
+        }
+        var FALLBACK = ['#8b5cf6', '#22d3ee', '#f472b6', '#34d399', '#fbbf24', '#60a5fa'];
+        /** Palette for a project: base, gradient partner, soft fill, glow. */
+        function palette(color, i) {
+          var rgb = parseColor(color) || parseColor(FALLBACK[i % FALLBACK.length]);
+          var hsl = rgbToHsl(rgb[0], rgb[1], rgb[2]);
+          var base = 'rgb(' + rgb.join(',') + ')';
+          var h2 = (hsl[0] + 38) % 360;
+          var partner = 'hsl(' + h2.toFixed(0) + ',' + Math.min(95, hsl[1] + 10).toFixed(0) + '%,' + Math.min(72, hsl[2] + 12).toFixed(0) + '%)';
+          return {
+            c: base,
+            c2: partner,
+            soft: 'rgba(' + rgb.join(',') + ',0.16)',
+            line: 'rgba(' + rgb.join(',') + ',0.45)',
+            glow: 'rgba(' + rgb.join(',') + ',0.65)',
+          };
+        }
+        function pcVars(p) {
+          return '--pc:' + p.c + ';--pc2:' + p.c2 + ';--pc-soft:' + p.soft + ';--pc-line:' + p.line + ';--pc-glow:' + p.glow + ';';
+        }
+
+        // ---------- helpers ----------
+        function esc(s) {
+          return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) {
+            return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+          });
+        }
+        var ease = function (x) {
+          return 1 - Math.pow(1 - x, 4);
+        };
+        /** Animate every [data-count] element from its previous value to its new one. */
+        function runCounters(root) {
+          root.querySelectorAll('[data-count]').forEach(function (el) {
+            var key = el.getAttribute('data-key');
+            var to = parseFloat(el.getAttribute('data-count'));
+            var dec = +(el.getAttribute('data-dec') || 0);
+            var from = key in prevVals ? prevVals[key] : 0;
+            prevVals[key] = to;
+            if (from === to) {
+              el.textContent = fmtNum(to, dec);
+              return;
+            }
+            var t0 = performance.now();
+            var dur = 1400;
+            (function step(now) {
+              var k = Math.min(1, (now - t0) / dur);
+              el.textContent = fmtNum(from + (to - from) * ease(k), dec);
+              if (k < 1) requestAnimationFrame(step);
+            })(t0);
+          });
+        }
+        function counter(key, value, dec) {
+          return '<span data-count="' + value + '" data-key="' + esc(key) + '" data-dec="' + (dec || 0) + '">' + fmtNum(key in prevVals ? prevVals[key] : 0, dec) + '</span>';
+        }
+        /** Rings: render at the previous offset, then move to the new one. */
+        function runArcs(root) {
+          var arcs = root.querySelectorAll('[data-arc]');
+          arcs.forEach(function (el) {
+            var key = el.getAttribute('data-key');
+            var c = parseFloat(el.getAttribute('data-c'));
+            var to = parseFloat(el.getAttribute('data-arc'));
+            var from = key in prevVals ? prevVals[key] : 0;
+            prevVals[key] = to;
+            el.style.transition = 'none';
+            el.style.strokeDashoffset = String(c * (1 - from));
+          });
+          // force layout, then animate
+          void root.offsetWidth;
+          requestAnimationFrame(function () {
+            arcs.forEach(function (el) {
+              var c = parseFloat(el.getAttribute('data-c'));
+              var to = parseFloat(el.getAttribute('data-arc'));
+              el.style.transition = '';
+              el.style.strokeDashoffset = String(c * (1 - to));
+            });
+          });
+        }
+        function clamp01(x) {
+          return Math.max(0, Math.min(1, x || 0));
+        }
+        var uid = 0;
+        /**
+         * One ring: track, ghost arc (today's potential), progress arc.
+         * r = radius, w = stroke width, cx/cy = center.
+         */
+        function ringParts(o) {
+          var id = 'rg' + ++uid;
+          var C = 2 * Math.PI * o.r;
+          var ratio = clamp01(o.ratio);
+          var ghost = clamp01(o.ratio + (o.ghost || 0));
+          var s = '';
+          s += '<defs><linearGradient id="' + id + '" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="' + o.p.c + '"/><stop offset="1" stop-color="' + o.p.c2 + '"/></linearGradient>';
+          s += '<filter id="' + id + 'f" x="-30%" y="-30%" width="160%" height="160%"><feGaussianBlur stdDeviation="' + (o.w / 2.2).toFixed(1) + '"/></filter></defs>';
+          var g = '<g transform="rotate(-90 ' + o.cx + ' ' + o.cy + ')">';
+          s += g + '<circle cx="' + o.cx + '" cy="' + o.cy + '" r="' + o.r + '" fill="none" style="stroke:' + o.p.soft + '" stroke-width="' + o.w + '"/>';
+          if (ghost > ratio) {
+            s += '<circle class="arc-ghost" cx="' + o.cx + '" cy="' + o.cy + '" r="' + o.r + '" fill="none" stroke="' + o.p.c2 + '" stroke-width="' + o.w + '" stroke-linecap="round" stroke-dasharray="' + C + '" stroke-dashoffset="' + C * (1 - ghost) + '"/>';
+          }
+          // glow copy + crisp arc
+          s += '<circle class="arc" data-arc="' + ratio + '" data-c="' + C + '" data-key="' + esc(o.key) + '-glow" cx="' + o.cx + '" cy="' + o.cy + '" r="' + o.r + '" fill="none" stroke="url(#' + id + ')" stroke-width="' + o.w + '" stroke-linecap="round" stroke-dasharray="' + C + '" stroke-dashoffset="' + C + '" filter="url(#' + id + 'f)" opacity="' + (ratio > 0 ? 0.55 : 0) + '"/>';
+          s += '<circle class="arc" data-arc="' + ratio + '" data-c="' + C + '" data-key="' + esc(o.key) + '" cx="' + o.cx + '" cy="' + o.cy + '" r="' + o.r + '" fill="none" stroke="url(#' + id + ')" stroke-width="' + o.w + '" stroke-linecap="round" stroke-dasharray="' + C + '" stroke-dashoffset="' + C + '" opacity="' + (ratio > 0 ? 1 : 0) + '"/>';
+          s += '</g>';
+          return s;
+        }
+
+        var ICONS = {
+          cal: '<svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4.5" width="18" height="16" rx="3"/><path d="M3 9.5h18M8 2.5v4M16 2.5v4"/></svg>',
+          check: '<svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="m8 12.5 2.6 2.6L16 9.5"/></svg>',
+          flag: '<svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 21V4m0 0h11l-2 4 2 4H5"/></svg>',
+          up: '▲',
+          down: '▼',
+        };
+
+        // ---------- render ----------
+        function render() {
+          if (!model) return;
+          uid = 0;
+          var colorOf = {};
+          model.projects.forEach(function (p, i) {
+            colorOf[p.id] = palette(p.color, i);
+          });
+          renderHero(colorOf);
+          renderProjects(colorOf);
+          renderBurndown(colorOf);
+          renderHeatmap();
+          renderToday(colorOf);
+          renderPace(colorOf);
+          runArcs(document.body);
+          runCounters(document.body);
+          requestAnimationFrame(function () {
+            document.querySelectorAll('.kpi .bar[data-scale]').forEach(function (b) {
+              b.style.transform = 'scaleX(' + b.getAttribute('data-scale') + ')';
+            });
+            document.querySelectorAll('.pace-track .fill[data-w]').forEach(function (b) {
+              b.style.width = b.getAttribute('data-w');
+            });
+          });
+          firstRender = false;
+        }
+
+        function greeting() {
+          var h = new Date().getHours();
+          if (h >= 5 && h < 12) return t('GREETING_MORNING');
+          if (h >= 12 && h < 18) return t('GREETING_AFTERNOON');
+          if (h >= 18 && h < 24) return t('GREETING_EVENING');
+          return t('GREETING_NIGHT');
+        }
+
+        function paceLabel(pace, long) {
+          if (pace == null) return t('NO_PLAN');
+          if (pace > 0) return t(long ? 'AHEAD_LONG' : 'AHEAD', { n: pace });
+          if (pace < 0) return t(long ? 'BEHIND_LONG' : 'BEHIND', { n: -pace });
+          return t('ON_TRACK');
+        }
+
+        function renderHero(colorOf) {
+          var o = model.overall;
+          var remainingToday = o.plannedToday;
+          var sub;
+          if (remainingToday > 0) sub = t('SUB_PLANNED', { n: remainingToday, pts: '<b>' + t('PTS', { n: pts(o.todayGainPts) }) + '</b>' });
+          else if (o.doneToday > 0) sub = t('SUB_ALL_DONE', { pts: '<b>' + t('PTS', { n: pts(o.gainedPts) }) + '</b>' });
+          else sub = t('SUB_NONE');
+          // escape everything except the <b> we inserted
+          var dateStr = dfmt({ weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }, model.today);
+
+          var html = '<div style="position:relative;z-index:1;min-width:0">';
+          html += '<div class="eyebrow"><span class="dot"></span>' + esc(dateStr) + '</div>';
+          html += '<h1 class="greet"><span class="grad-text">' + esc(greeting()) + '</span></h1>';
+          html += '<p class="hero-sub">' + sub + '</p>';
+          html += '<div class="kpis">';
+          // days of effort
+          html += kpi('KPI_EFFORT', counter('effort', o.effortDays) + '<small>' + esc(t('DAYS_UNIT')) + '</small>', t('KPI_EFFORT_HINT'), null, '');
+          // completion
+          html += kpi('KPI_COMPLETION', counter('overallPct', o.ratio * 100, 1) + '<small>%</small>', t('KPI_COMPLETION_HINT', { done: fmtNum(o.done), total: fmtNum(o.total) }), o.ratio, '');
+          // today's contribution
+          html += kpi('KPI_TODAY', '+' + counter('todayPts', o.todayGainPts + o.gainedPts, 2) + '<small>' + (lang === 'ko' ? '%p' : 'pts') + '</small>', t('KPI_TODAY_HINT', { gained: t('PTS', { n: pts(o.gainedPts) }) }), null, 'k-today');
+          // streak
+          html += kpi(
+            'KPI_STREAK',
+            '<span class="flame' + (o.checkedToday ? '' : ' off') + '">🔥</span> ' + counter('streak', o.streak) + '<small>' + esc(t('DAYS_UNIT')) + '</small>',
+            t('KPI_STREAK_HINT', { n: o.bestStreak }),
+            null,
+            ''
+          );
+          html += '</div></div>';
+
+          // concentric rings, one per goal with items (outermost = first goal)
+          var ps = model.projects.filter(function (p) {
+            return p.total > 0;
+          });
+          var size = 280;
+          var w = ps.length > 4 ? 12 : 16;
+          var gap = ps.length > 4 ? 5 : 6;
+          var svg = '<svg viewBox="0 0 ' + size + ' ' + size + '">';
+          ps.forEach(function (p, i) {
+            var r = size / 2 - w / 2 - 4 - i * (w + gap);
+            if (r < 40) return;
+            svg += ringParts({ cx: size / 2, cy: size / 2, r: r, w: w, ratio: p.ratio, ghost: p.todayGainPts / 100, p: colorOf[p.id], key: 'hero-' + p.id });
+          });
+          svg += '</svg>';
+          html += '<div class="hero-rings"><div class="rings-box">' + svg;
+          html += '<div class="rings-center"><div class="big">' + counter('overallPct2', o.ratio * 100, 1) + '<small>%</small></div><div class="cap">' + esc(t('OVERALL')) + '</div>';
+          if (o.todayGainPts > 0) html += '<div class="gain">' + esc(t('TODAY_PTS', { n: t('PTS', { n: pts(o.todayGainPts) }) })) + '</div>';
+          html += '</div></div><div class="ring-legend">';
+          ps.forEach(function (p) {
+            html += '<span><i style="background:' + colorOf[p.id].c + ';box-shadow:0 0 8px ' + colorOf[p.id].glow + '"></i>' + esc(p.title || t('UNTITLED')) + '</span>';
+          });
+          html += '</div></div>';
+          $('hero').innerHTML = html;
+        }
+        function kpi(labelKey, valHtml, hint, barRatio, cls) {
+          return (
+            '<div class="kpi ' + cls + '"><div class="lbl">' + esc(t(labelKey)) + '</div><div class="val">' + valHtml + '</div><div class="hint">' + esc(hint) + '</div>' +
+            (barRatio != null ? '<div class="bar" data-scale="' + clamp01(barRatio) + '"></div>' : '') +
+            '</div>'
+          );
+        }
+
+        function renderProjects(colorOf) {
+          var html = '';
+          model.projects.forEach(function (p, i) {
+            var c = colorOf[p.id];
+            var C = 2 * Math.PI * 48;
+            html += '<div class="pcard rise" style="' + pcVars(c) + 'animation-delay:' + (0.1 + i * 0.06) + 's">';
+            html += '<div class="pring"><svg viewBox="0 0 116 116">' + ringParts({ cx: 58, cy: 58, r: 48, w: 11, ratio: p.ratio, ghost: p.todayGainPts / 100, p: c, key: 'p-' + p.id }) + '</svg>';
+            html += '<div class="pct">' + (p.total ? counter('pp-' + p.id, p.ratio * 100, p.ratio > 0 && p.ratio < 0.1 ? 1 : 0) + '<small>%</small>' : '–') + '</div></div>';
+            html += '<div class="pbody"><div class="ptitle"><span title="' + esc(p.title) + '">' + esc(p.title || t('UNTITLED')) + '</span>';
+            if (p.planEnd != null && p.done < p.total) {
+              var dd = p.planEnd - model.today;
+              if (dd >= 0) html += '<span class="dday">' + esc(dd === 0 ? t('D_DAY_TODAY') : t('D_DAY', { n: dd })) + '</span>';
+            }
+            html += '</div><div class="pmeta">';
+            if (!p.total) {
+              html += '<div class="row">' + esc(t('NO_ITEMS')) + '</div>';
+            } else {
+              html += '<div class="row">' + ICONS.cal + '<span>' + boldNum(t('EFFORT_DAYS', { n: p.effortDays }), p.effortDays) + '</span></div>';
+              html += '<div class="row">' + ICONS.check + '<span>' + boldNum(t('ITEMS_DONE', { done: fmtNum(p.done), total: fmtNum(p.total) }), null) + '</span></div>';
+              if (p.projectedEnd != null && p.done < p.total) {
+                html += '<div class="row">' + ICONS.flag + '<span>' + esc(t('PROJECTED')) + ' <b>' + esc(fmtLong(p.projectedEnd)) + '</b></span></div>';
+              }
+            }
+            html += '</div><div class="chips">';
+            if (p.total && p.done === p.total) html += '<span class="chip ahead">✓ ' + esc(t('COMPLETE')) + '</span>';
+            if (p.todayGainPts > 0) html += '<span class="chip today">' + esc(t('TODAY_PTS', { n: t('PTS', { n: pts(p.todayGainPts) }) })) + '</span>';
+            if (p.gainedPts > 0) html += '<span class="chip gained">' + esc(t('GAINED_PTS', { n: t('PTS', { n: pts(p.gainedPts) }) })) + '</span>';
+            if (p.pace != null && p.done < p.total) {
+              html += '<span class="chip ' + (p.pace > 0 ? 'ahead' : p.pace < 0 ? 'behind' : 'track') + '">' + (p.pace > 0 ? ICONS.up + ' ' : p.pace < 0 ? ICONS.down + ' ' : '● ') + esc(paceLabel(p.pace)) + '</span>';
+            }
+            html += '</div></div></div>';
+          });
+          $('projects').innerHTML = html;
+          $('projSub').textContent = '';
+        }
+        function boldNum(text, n) {
+          // bold the digits in a translated sentence
+          return esc(text).replace(/[\d,.]+(\s*\/\s*[\d,.]+)?/, function (m) {
+            return '<b>' + m + '</b>';
+          });
+        }
+
+        // ---------- burndown ----------
+        function renderBurndown(colorOf) {
+          var dated = model.projects.filter(function (p) {
+            return p.burndown;
+          });
+          var card = $('burndownCard');
+          var html = '<div class="sec-head"><h2>' + esc(t('BURNDOWN')) + '</h2><span class="sub">' + esc(t('BURNDOWN_SUB')) + '</span><span class="grow"></span>';
+          if (!dated.length) {
+            card.innerHTML = html + '</div><div class="empty">' + esc(t('NO_BURNDOWN')) + '</div>';
+            return;
+          }
+          var sel = dated.find(function (p) {
+            return p.id === ui.burndown;
+          }) || dated[0];
+          if (dated.length > 1) {
+            html += '<div class="bd-tabs">';
+            dated.forEach(function (p) {
+              html += '<button class="bd-tab' + (p === sel ? ' on' : '') + '" data-bd="' + esc(p.id) + '"><i style="background:' + colorOf[p.id].c + '"></i>' + esc(p.title) + '</button>';
+            });
+            html += '</div>';
+          }
+          html += '</div>';
+          var c = colorOf[sel.id];
+          var b = sel.burndown;
+          BD.w = Math.max(320, Math.round(card.clientWidth - 46));
+          // stats row
+          var paceCls = sel.pace > 0 ? 'good' : sel.pace < 0 ? 'bad' : '';
+          var shift = sel.projectedEnd != null ? sel.projectedEnd - sel.planEnd : null;
+          html += '<div class="bd-stats">';
+          html += '<div class="bd-stat"><div class="l">' + esc(t('KPI_PACE')) + '</div><div class="v ' + paceCls + '">' + esc(paceLabel(sel.pace, true)) + '</div></div>';
+          html += '<div class="bd-stat"><div class="l">' + esc(t('PLAN_END')) + '</div><div class="v">' + esc(fmtLong(sel.planEnd)) + '</div></div>';
+          html +=
+            '<div class="bd-stat"><div class="l">' + esc(t('PROJECTED')) + '</div><div class="v ' + (shift > 0 ? 'bad' : shift < 0 ? 'good' : '') + '">' +
+            (sel.projectedEnd != null ? esc(fmtLong(sel.projectedEnd)) : '–') +
+            '</div></div>';
+          html += '</div>';
+          html += '<div class="bd-wrap" style="' + pcVars(c) + '">' + burndownSvg(sel, c) + '</div>';
+          html += '<div class="legend">';
+          html += '<span><svg viewBox="0 0 22 8"><line x1="0" y1="4" x2="22" y2="4" stroke="' + c.c2 + '" stroke-width="2" stroke-dasharray="4 3"/></svg>' + esc(t('LEGEND_PLAN')) + '</span>';
+          html += '<span><svg viewBox="0 0 22 8"><line x1="0" y1="4" x2="22" y2="4" stroke="' + c.c + '" stroke-width="3" stroke-linecap="round"/></svg>' + esc(t('LEGEND_ACTUAL')) + '</span>';
+          html += '<span><svg viewBox="0 0 22 8"><line x1="1" y1="4" x2="22" y2="4" style="stroke:var(--muted)" stroke-width="2" stroke-dasharray="1 4" stroke-linecap="round"/></svg>' + esc(t('LEGEND_PROJECTION')) + '</span>';
+          html += '</div>';
+          card.innerHTML = html;
+          card.querySelectorAll('[data-bd]').forEach(function (btn) {
+            btn.addEventListener('click', function () {
+              ui.burndown = btn.getAttribute('data-bd');
+              saveUi();
+              renderBurndown(colorOf);
+              runCounters(card);
+            });
+          });
+          bindBurndownHover(card, sel, c);
+        }
+
+        var BD = { w: 900, h: 300, l: 44, r: 16, t: 14, b: 30 };
+        function bdScale(sel) {
+          var b = sel.burndown;
+          var span = Math.max(1, b.end - b.start);
+          return {
+            x: function (d) {
+              return BD.l + ((d - b.start) / span) * (BD.w - BD.l - BD.r);
+            },
+            y: function (v) {
+              return BD.t + (1 - v / Math.max(1, b.total)) * (BD.h - BD.t - BD.b);
+            },
+          };
+        }
+        function burndownSvg(sel, c) {
+          var b = sel.burndown;
+          var s = bdScale(sel);
+          var id = 'bd' + ++uid;
+          var svg = '<svg viewBox="0 0 ' + BD.w + ' ' + BD.h + '" width="' + BD.w + '" height="' + BD.h + '" id="bdSvg">';
+          svg += '<defs><linearGradient id="' + id + 'a" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="' + c.c + '" stop-opacity="0.45"/><stop offset="1" stop-color="' + c.c + '" stop-opacity="0"/></linearGradient>';
+          svg += '<linearGradient id="' + id + 'l" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="' + c.c + '"/><stop offset="1" stop-color="' + c.c2 + '"/></linearGradient>';
+          svg += '<filter id="' + id + 'g"><feGaussianBlur stdDeviation="4"/></filter></defs>';
+          // grid + y labels
+          svg += '<g class="bd-grid">';
+          var steps = 4;
+          for (var i = 0; i <= steps; i++) {
+            var v = Math.round((b.total * i) / steps);
+            var y = s.y(v);
+            svg += '<line x1="' + BD.l + '" x2="' + (BD.w - BD.r) + '" y1="' + y + '" y2="' + y + '"/>';
+          }
+          svg += '</g><g class="bd-axis">';
+          for (i = 0; i <= steps; i++) {
+            v = Math.round((b.total * i) / steps);
+            svg += '<text x="' + (BD.l - 8) + '" y="' + (s.y(v) + 4) + '" text-anchor="end">' + v + '</text>';
+          }
+          // x labels: month starts or week starts
+          var span = b.end - b.start;
+          var lastX = -999;
+          for (var d = b.start; d <= b.end; d++) {
+            var dt = new Date(d * L.DAY_MS);
+            var mark = span > 120 ? dt.getUTCDate() === 1 : span > 30 ? L.dow(d) === 1 : true;
+            if (span <= 30 && (d - b.start) % Math.ceil(span / 8 || 1) !== 0) mark = false;
+            if (!mark) continue;
+            var x = s.x(d);
+            if (x - lastX < 56) continue;
+            lastX = x;
+            svg += '<text x="' + x + '" y="' + (BD.h - 8) + '" text-anchor="middle">' + esc(fmtShort(d)) + '</text>';
+          }
+          svg += '</g>';
+          // plan line (step-ish polyline)
+          var planPts = [[s.x(b.start), s.y(b.total)]];
+          b.plan.forEach(function (v, k) {
+            planPts.push([s.x(b.start + k), s.y(v)]);
+          });
+          svg += pathEl(planPts, 'bd-plan fade-in', 'stroke="' + c.c2 + '"');
+          // today marker
+          var tx = s.x(model.today);
+          svg += '<line x1="' + tx + '" x2="' + tx + '" y1="' + BD.t + '" y2="' + (BD.h - BD.b) + '" stroke="#f472b6" stroke-width="1.5" stroke-dasharray="3 4" opacity="0.8"/>';
+          var tAnchor = tx < BD.l + 40 ? 'start' : tx > BD.w - BD.r - 40 ? 'end' : 'middle';
+          svg += '<text x="' + (tAnchor === 'start' ? tx + 4 : tAnchor === 'end' ? tx - 4 : tx) + '" y="' + (BD.t - 2) + '" text-anchor="' + tAnchor + '" fill="#f472b6" font-size="11" font-weight="700">' + esc(t('TODAY')) + '</text>';
+          // actual area + line
+          var act = [[s.x(b.start), s.y(b.total)]];
+          b.actual.forEach(function (v, k) {
+            act.push([s.x(b.start + k), s.y(v)]);
+          });
+          var last = act[act.length - 1];
+          var area = act.concat([[last[0], s.y(0)], [act[0][0], s.y(0)]]);
+          svg += '<path class="fade-in" d="' + dPath(area) + 'Z" fill="url(#' + id + 'a)"/>';
+          svg += pathEl(act, 'bd-actual draw', 'stroke="url(#' + id + 'l)" filter="url(#' + id + 'g)" opacity="0.6"');
+          svg += pathEl(act, 'bd-actual draw', 'stroke="url(#' + id + 'l)"');
+          // projection
+          if (sel.projectedEnd != null && sel.done < sel.total) {
+            var pe = Math.min(sel.projectedEnd, b.end);
+            var remaining = b.actual.length ? b.actual[b.actual.length - 1] : b.total;
+            var endV = sel.projectedEnd > b.end ? remaining * (1 - (b.end - model.today) / Math.max(1, sel.projectedEnd - model.today)) : 0;
+            svg += pathEl([last, [s.x(pe), s.y(endV)]], 'bd-proj fade-in', 'style="stroke:var(--muted)"');
+            svg += '<circle class="fade-in" cx="' + s.x(pe) + '" cy="' + s.y(endV) + '" r="4" style="fill:var(--card-solid);stroke:var(--muted)" stroke-width="2"/>';
+          }
+          // live dot
+          svg += '<circle cx="' + last[0] + '" cy="' + last[1] + '" r="9" fill="' + c.c + '" opacity="0.25"><animate attributeName="r" values="6;13;6" dur="2.4s" repeatCount="indefinite"/><animate attributeName="opacity" values="0.35;0;0.35" dur="2.4s" repeatCount="indefinite"/></circle>';
+          svg += '<circle cx="' + last[0] + '" cy="' + last[1] + '" r="5" fill="' + c.c + '" style="stroke:var(--card-solid)" stroke-width="2"/>';
+          // hover guide
+          svg += '<line id="bdHover" x1="0" x2="0" y1="' + BD.t + '" y2="' + (BD.h - BD.b) + '" style="display:none;stroke:var(--line-strong)" stroke-width="1"/>';
+          svg += '</svg>';
+          return svg;
+        }
+        function dPath(p) {
+          return p
+            .map(function (q, i) {
+              return (i ? 'L' : 'M') + q[0].toFixed(1) + ' ' + q[1].toFixed(1);
+            })
+            .join('');
+        }
+        function pathEl(p, cls, attrs) {
+          var len = 0;
+          for (var i = 1; i < p.length; i++) len += Math.hypot(p[i][0] - p[i - 1][0], p[i][1] - p[i - 1][1]);
+          return '<path class="' + cls + '" style="--len:' + Math.ceil(len + 2) + '" d="' + dPath(p) + '" ' + attrs + '/>';
+        }
+        function bindBurndownHover(card, sel, c) {
+          var svg = card.querySelector('#bdSvg');
+          var guide = card.querySelector('#bdHover');
+          if (!svg) return;
+          var b = sel.burndown;
+          svg.addEventListener('mousemove', function (e) {
+            var r = svg.getBoundingClientRect();
+            var vx = ((e.clientX - r.left) / r.width) * BD.w;
+            var span = Math.max(1, b.end - b.start);
+            var d = Math.round(b.start + ((vx - BD.l) / (BD.w - BD.l - BD.r)) * span);
+            if (d < b.start || d > b.end) return hideTip();
+            var k = d - b.start;
+            var x = bdScale(sel).x(d);
+            guide.setAttribute('x1', x);
+            guide.setAttribute('x2', x);
+            guide.style.display = '';
+            var h = '<b>' + esc(fmtLong(d)) + '</b><br>' + esc(t('TIP_PLAN_LEFT', { n: b.plan[k] }));
+            if (k < b.actual.length) h += '<br><span style="color:' + c.c + '">●</span> ' + esc(t('TIP_ACTUAL_LEFT', { n: b.actual[k] }));
+            showTip(h, e.clientX, e.clientY);
+          });
+          svg.addEventListener('mouseleave', function () {
+            guide.style.display = 'none';
+            hideTip();
+          });
+        }
+
+        // ---------- heatmap ----------
+        function renderHeatmap() {
+          var today = model.today;
+          var card = $('heatCard');
+          var avail = Math.max(300, card.clientWidth - 46 - 32);
+          var lastPlan0 = today;
+          Object.keys(model.heatPlan).forEach(function (d) {
+            if (+d > lastPlan0) lastPlan0 = +d;
+          });
+          var futureWeeks = Math.ceil((Math.min(lastPlan0, today + 7 * 26) - (today - L.dow(today))) / 7) + 1;
+          var CELL_MAX = 18;
+          var weeksBack = Math.max(17, Math.floor(avail / (CELL_MAX + 4)) - futureWeeks);
+          weeksBack = Math.min(weeksBack, 52);
+          var start = today - L.dow(today) - weeksBack * 7; // a Sunday
+          var lastPlan = today;
+          Object.keys(model.heatPlan).forEach(function (d) {
+            if (+d > lastPlan) lastPlan = +d;
+          });
+          var end = Math.min(lastPlan, today + 7 * 26);
+          end = end + (6 - L.dow(end)); // through Saturday
+          var weeks = Math.round((end - start + 1) / 7);
+          var cell = Math.max(10, Math.min(CELL_MAX, Math.floor(avail / weeks) - 4));
+          var totalChecks = 0;
+          Object.keys(model.heat).forEach(function (d) {
+            if (+d >= start && +d <= today) totalChecks += model.heat[d];
+          });
+          var html = '<div class="sec-head"><h2>' + esc(t('HEATMAP')) + '</h2><span class="sub">' + esc(t('HEATMAP_SUB', { n: totalChecks, w: weeksBack + 1 })) + '</span></div>';
+          html += '<div class="hm-scroll" id="hmScroll"><div class="hm" style="--cell:' + cell + 'px;grid-template-columns: 28px">';
+          // weekday labels column
+          html += '<div style="grid-row:1"></div>';
+          for (var r = 0; r < 7; r++) {
+            var lbl = r === 1 || r === 3 || r === 5 ? dfmt({ weekday: 'short' }, start + r) : '';
+            html += '<div class="dlabel" style="grid-row:' + (r + 2) + '">' + esc(lbl) + '</div>';
+          }
+          // Month labels: on the first week, and on every week holding a 1st.
+          // When week 1 holds a 1st, week 0's label would collide, so drop it.
+          var labels = [];
+          for (var w = 0; w < weeks; w++) {
+            var ws0 = start + w * 7;
+            labels[w] = '';
+            for (var k = 0; k < 7; k++) if (new Date((ws0 + k) * L.DAY_MS).getUTCDate() === 1) labels[w] = dfmt({ month: 'short' }, ws0 + k);
+          }
+          if (!labels[0] && !labels[1]) labels[0] = dfmt({ month: 'short' }, start);
+          if (labels[0] && labels[1]) labels[0] = '';
+          for (w = 0; w < weeks; w++) {
+            var ws = start + w * 7;
+            html += '<div class="mlabel" style="grid-column:' + (w + 2) + '">' + esc(labels[w]) + '</div>';
+            for (k = 0; k < 7; k++) {
+              var d = ws + k;
+              var n = model.heat[d] || 0;
+              var p = model.heatPlan[d] || 0;
+              var cls = 'cell';
+              if (d > today) {
+                cls += ' future' + (p ? ' p' + (p >= 6 ? 3 : p >= 3 ? 2 : 1) : '');
+              } else if (n) {
+                cls += ' l' + (n >= 10 ? 4 : n >= 5 ? 3 : n >= 2 ? 2 : 1);
+              }
+              if (d === today) cls += ' today';
+              var delay = Math.min(1.2, w * 0.022 + k * 0.012);
+              html += '<div class="' + cls + '" data-d="' + d + '" style="grid-column:' + (w + 2) + ';grid-row:' + (k + 2) + ';animation-delay:' + delay.toFixed(3) + 's"></div>';
+            }
+          }
+          html += '</div></div>';
+          html += '<div class="hm-legend">' + esc(t('LESS')) + ' <span class="cell"></span><span class="cell l1"></span><span class="cell l2"></span><span class="cell l3"></span><span class="cell l4"></span> ' + esc(t('MORE'));
+          html += '<span class="sp"></span><span class="cell future p2"></span> ' + esc(t('PLANNED')) + '</div>';
+          card.innerHTML = html;
+          card.querySelectorAll('.hm .cell').forEach(function (cell) {
+            cell.addEventListener('mouseenter', function (e) {
+              var d = +cell.getAttribute('data-d');
+              var n = model.heat[d] || 0;
+              var p = model.heatPlan[d] || 0;
+              var h = '<b>' + esc(dfmt({ weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' }, d)) + '</b><br>';
+              h += d > model.today ? esc(t('TIP_PLANNED', { n: p })) : esc(n ? t('TIP_CHECKS', { n: n }) : t('TIP_NO_CHECKS'));
+              if (d === model.today && p) h += '<br>' + esc(t('TIP_PLANNED', { n: p }));
+              var r = cell.getBoundingClientRect();
+              showTip(h, r.left + r.width / 2, r.top);
+            });
+            cell.addEventListener('mouseleave', hideTip);
+          });
+          // keep today in view
+          var sc = $('hmScroll');
+          var todayCell = card.querySelector('.cell.today');
+          if (sc && todayCell) sc.scrollLeft = Math.max(0, todayCell.offsetLeft - sc.clientWidth * 0.6);
+        }
+
+        // ---------- today ----------
+        function itemDone(l) {
+          return l.id in pending ? pending[l.id] : l.done;
+        }
+        function renderToday(colorOf) {
+          var items = model.todayItems;
+          var o = model.overall;
+          var total = items.length;
+          var doneN = items.filter(itemDone).length;
+          var ratio = total ? doneN / total : 0;
+          var html = '<div class="today-head">';
+          var C = 2 * Math.PI * 21;
+          html += '<div class="mini-ring"><svg viewBox="0 0 52 52">' + ringParts({ cx: 26, cy: 26, r: 21, w: 6, ratio: ratio, p: { c: '#8b5cf6', c2: '#22d3ee', soft: 'var(--track)' }, key: 'todayRing' }) + '</svg><b>' + doneN + '/' + total + '</b></div>';
+          html += '<div><h2>' + esc(t('TODAY')) + '</h2><div class="date">' + esc(dfmt({ weekday: 'short', month: 'short', day: 'numeric' }, model.today)) + '</div></div>';
+          html += '<div class="today-pts"><div class="v grad-text">+' + counter('todayPts2', o.gainedPts, 2) + (lang === 'ko' ? '%p' : ' pts') + '</div><div class="l">' + esc(t('TODAY_PTS', { n: t('PTS', { n: pts(o.todayGainPts + o.gainedPts) }) })) + '</div></div>';
+          html += '</div>';
+          if (!total) {
+            html += '<div class="empty"><span class="big">🌤️</span>' + esc(t('TODAY_EMPTY')) + '</div>';
+          } else {
+            if (doneN === total) html += '<div class="alldone">🎉 ' + esc(t('TODAY_ALL_DONE')) + '</div>';
+            html += '<ul class="tlist">' + items.map(function (l) {
+              return itemHtml(l, colorOf, false);
+            }).join('') + '</ul>';
+          }
+          if (model.overdue.length) {
+            html += '<div class="sub-head">' + esc(t('OVERDUE')) + '<span>' + esc(t('OVERDUE_COUNT', { n: model.overdue.length })) + '</span></div>';
+            var shown = ui.showAllOverdue ? model.overdue.slice(0, 100) : model.overdue.slice(0, 5);
+            html += '<ul class="tlist">' + shown.map(function (l) {
+              return itemHtml(l, colorOf, true);
+            }).join('') + '</ul>';
+            if (model.overdue.length > 5) {
+              html += '<button class="more" id="moreOverdue">' + esc(ui.showAllOverdue ? t('SHOW_LESS') : t('SHOW_MORE', { n: model.overdue.length - 5 })) + '</button>';
+            }
+          }
+          var card = $('todayCard');
+          card.innerHTML = html;
+          card.querySelectorAll('[data-check]').forEach(function (btn) {
+            btn.addEventListener('click', onCheck);
+          });
+          var more = card.querySelector('#moreOverdue');
+          if (more)
+            more.addEventListener('click', function () {
+              ui.showAllOverdue = !ui.showAllOverdue;
+              renderToday(lastColors());
+              runArcs(card);
+              runCounters(card);
+            });
+          card.querySelectorAll('[data-open]').forEach(function (el) {
+            el.addEventListener('click', function () {
+              if (typeof PluginAPI.selectTask === 'function') PluginAPI.selectTask(el.getAttribute('data-open')).catch(function () {});
+            });
+          });
+          justChecked = {};
+        }
+        function itemHtml(l, colorOf, late) {
+          var proj = model.projects.find(function (p) {
+            return p.id === l.projectId;
+          });
+          var c = colorOf[l.projectId];
+          var done = itemDone(l);
+          var ptsVal = proj && proj.total ? 100 / proj.total : 0;
+          var cls = 'titem' + (done ? ' done' : '') + (justChecked[l.id] ? ' just' : '');
+          var h = '<li class="' + cls + '" style="' + pcVars(c) + '"><span class="sweep"></span>';
+          h +=
+            '<button class="check' + (done ? ' on' : '') + '" data-check="' + esc(l.id) + '" data-done="' + (done ? 1 : 0) + '"' + (l.id in pending ? ' disabled' : '') +
+            ' title="' + esc(t(done ? 'MARK_UNDONE' : 'MARK_DONE')) + '" aria-label="' + esc(t(done ? 'MARK_UNDONE' : 'MARK_DONE')) + '"><svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></button>';
+          h += '<div class="tmain"><div class="ttitle" data-open="' + esc(l.id) + '" title="' + esc(t('OPEN_TASK')) + '">' + esc(l.title || t('UNTITLED')) + '</div>';
+          h += '<div class="tsub"><span class="pdot"></span>' + esc(proj ? proj.title : '') + (l.parentTitle ? ' · ' + esc(l.parentTitle) : '');
+          if (l.plan !== model.today && !late && done) h += ' · ' + esc(t('CHECKED_OFF_PLAN'));
+          h += '</div></div>';
+          h += late ? '<span class="tpts late">' + esc(fmtShort(l.plan)) + '</span>' : '<span class="tpts">+' + esc(t('PTS', { n: pts(ptsVal) })) + '</span>';
+          h += '</li>';
+          return h;
+        }
+        async function onCheck(e) {
+          var btn = e.currentTarget;
+          var id = btn.getAttribute('data-check');
+          var toDone = btn.getAttribute('data-done') !== '1';
+          pending[id] = toDone;
+          if (toDone) {
+            justChecked[id] = true;
+            var r = btn.getBoundingClientRect();
+            var color = getComputedStyle(btn).getPropertyValue('--pc').trim();
+            burst(r.left + r.width / 2, r.top + r.height / 2, color);
+          }
+          renderToday(lastColors());
+          runArcs($('todayCard'));
+          runCounters($('todayCard'));
+          try {
+            await PluginAPI.updateTask(id, { isDone: toDone });
+          } catch (err) {
+            delete pending[id];
+            renderToday(lastColors());
+            runArcs($('todayCard'));
+            try {
+              PluginAPI.showSnack({ msg: t('UPDATE_FAILED', { error: (err && err.message) || String(err) }), type: 'ERROR' });
+            } catch (e2) {}
+            return;
+          }
+          // dataChanged reloads the model; clear the pending flag once it has.
+          setTimeout(function () {
+            if (pending[id] === toDone) {
+              delete pending[id];
+              scheduleReload(true);
+            }
+          }, 1500);
+        }
+        function lastColors() {
+          var m = {};
+          model.projects.forEach(function (p, i) {
+            m[p.id] = palette(p.color, i);
+          });
+          return m;
+        }
+
+        // ---------- pace ----------
+        function renderPace(colorOf) {
+          var o = model.overall;
+          var html = '<div class="sec-head"><h2>' + esc(t('PACE_CARD')) + '</h2></div>';
+          var dated = model.projects.filter(function (p) {
+            return p.dated > 0;
+          });
+          if (!dated.length) {
+            $('paceCard').innerHTML = html + '<div class="empty">' + esc(t('PACE_NONE')) + '</div>';
+            return;
+          }
+          var cls = o.pace > 0 ? 'good' : o.pace < 0 ? 'bad' : 'flat';
+          var sign = o.pace > 0 ? '+' : o.pace < 0 ? '−' : '±';
+          html += '<div class="pace-big"><div class="num ' + cls + '">' + sign + counter('pace', Math.abs(o.pace)) + '</div><div class="txt"><div>' + esc(paceLabel(o.pace, true)) + '</div><div>' + esc(t('KPI_PACE')) + '</div></div></div>';
+          html += '<div class="pace-rows">';
+          dated.forEach(function (p) {
+            var c = colorOf[p.id];
+            var expected = p.dueBefore / Math.max(1, p.total);
+            var shift = p.projectedEnd != null ? p.projectedEnd - p.planEnd : null;
+            var shiftTxt = shift == null ? '' : shift > 0 ? t('DAYS_LATE', { n: shift }) : shift < 0 ? t('DAYS_EARLY', { n: -shift }) : t('ON_SCHEDULE');
+            html += '<div class="pace-row" style="' + pcVars(c) + '"><div class="top"><span class="grow">' + esc(p.title) + '</span><span class="chip ' + (p.pace > 0 ? 'ahead' : p.pace < 0 ? 'behind' : 'track') + '">' + esc(paceLabel(p.pace)) + '</span></div>';
+            html += '<div class="pace-track"><div class="fill" data-w="' + (p.ratio * 100).toFixed(2) + '%"></div><div class="mark" style="left:calc(' + (expected * 100).toFixed(2) + '% - 1px)"></div></div>';
+            html += '<div class="bot"><span>' + esc(t('PROJECTED')) + ' ' + esc(p.projectedEnd != null ? fmtLong(p.projectedEnd) : '–') + '</span><span>' + esc(shiftTxt) + '</span></div></div>';
+          });
+          html += '</div>';
+          $('paceCard').innerHTML = html;
+        }
+
+        // ---------- tooltip ----------
+        function showTip(html, x, y) {
+          $tip.innerHTML = html;
+          $tip.classList.add('on');
+          var r = $tip.getBoundingClientRect();
+          var left = Math.min(window.innerWidth - r.width - 8, Math.max(8, x - r.width / 2));
+          var top = y - r.height - 12;
+          if (top < 8) top = y + 18;
+          $tip.style.left = left + 'px';
+          $tip.style.top = top + 'px';
+        }
+        function hideTip() {
+          $tip.classList.remove('on');
+        }
+
+        // ---------- confetti ----------
+        var cv = $('confetti');
+        var cx = cv.getContext('2d');
+        var parts = [];
+        var running = false;
+        function burst(x, y, color, big) {
+          if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+          var cols = [color || '#8b5cf6', '#22d3ee', '#f472b6', '#fbbf24', '#a78bfa'];
+          var n = big ? 160 : 46;
+          for (var i = 0; i < n; i++) {
+            var a = Math.random() * Math.PI * 2;
+            var sp = (big ? 5 : 2.5) + Math.random() * (big ? 9 : 5);
+            parts.push({
+              x: x,
+              y: y,
+              vx: Math.cos(a) * sp,
+              vy: Math.sin(a) * sp - (big ? 6 : 3),
+              s: 3 + Math.random() * 4,
+              r: Math.random() * Math.PI,
+              vr: (Math.random() - 0.5) * 0.4,
+              c: cols[i % cols.length],
+              life: 0,
+              max: 55 + Math.random() * 45,
+            });
+          }
+          if (!running) {
+            running = true;
+            requestAnimationFrame(tick);
+          }
+        }
+        function tick() {
+          var dpr = window.devicePixelRatio || 1;
+          if (cv.width !== innerWidth * dpr) {
+            cv.width = innerWidth * dpr;
+            cv.height = innerHeight * dpr;
+          }
+          cx.setTransform(dpr, 0, 0, dpr, 0, 0);
+          cx.clearRect(0, 0, innerWidth, innerHeight);
+          parts = parts.filter(function (p) {
+            return p.life < p.max;
+          });
+          parts.forEach(function (p) {
+            p.life++;
+            p.vy += 0.22;
+            p.vx *= 0.985;
+            p.x += p.vx;
+            p.y += p.vy;
+            p.r += p.vr;
+            cx.save();
+            cx.globalAlpha = Math.max(0, 1 - p.life / p.max);
+            cx.translate(p.x, p.y);
+            cx.rotate(p.r);
+            cx.fillStyle = p.c;
+            cx.fillRect(-p.s / 2, -p.s / 4, p.s, p.s / 2);
+            cx.restore();
+          });
+          if (parts.length) requestAnimationFrame(tick);
+          else {
+            running = false;
+            cx.clearRect(0, 0, innerWidth, innerHeight);
+          }
+        }
+
+        // ---------- data ----------
+        var wasAllDone = null;
+        async function load(force) {
+          try {
+            var todayStr = null;
+            if (typeof PluginAPI.getDayContext === 'function') {
+              try {
+                var ctx = await PluginAPI.getDayContext();
+                if (ctx) {
+                  todayStr = ctx.todayStr;
+                  dayOffsetMs = ctx.startOfNextDayDiffMs || 0;
+                }
+              } catch (e) {}
+            }
+            var res = await Promise.all([
+              PluginAPI.getTasks(),
+              PluginAPI.getArchivedTasks().catch(function () {
+                return [];
+              }),
+              PluginAPI.getAllProjects(),
+            ]);
+            var next = L.buildModel({ tasks: res[0], archivedTasks: res[1], projects: res[2], todayStr: todayStr, dayOffsetMs: dayOffsetMs });
+            var sig = JSON.stringify(next);
+            $err.style.display = 'none';
+            if (sig === lastSig && !force) return;
+            lastSig = sig;
+            // drop pending flags the store has caught up with
+            Object.keys(pending).forEach(function (id) {
+              var l = next.todayItems.concat(next.overdue).find(function (x) {
+                return x.id === id;
+              });
+              if (!l || l.done === pending[id]) delete pending[id];
+            });
+            var items = next.todayItems;
+            var allDone = items.length > 0 && items.every(function (l) {
+              return l.done;
+            });
+            if (wasAllDone === false && allDone) {
+              setTimeout(function () {
+                burst(innerWidth / 2, innerHeight / 3, '#8b5cf6', true);
+              }, 250);
+            }
+            wasAllDone = allDone;
+            model = next;
+            render();
+          } catch (e) {
+            console.error('[Dashboard] load failed', e);
+            $err.textContent = t('LOAD_ERROR', { error: e && e.message ? e.message : String(e) });
+            $err.style.display = 'block';
+          }
+        }
+        var reloadTimer = null;
+        function scheduleReload(force) {
+          clearTimeout(reloadTimer);
+          reloadTimer = setTimeout(function () {
+            load(force === true);
+          }, 200);
+        }
+
+        // ---------- settings ----------
+        var $startup = $('startup');
+        async function loadSettings() {
+          var s = { openOnStartup: true };
+          try {
+            var raw = await PluginAPI.loadPersistedData(SETTINGS_KEY);
+            if (raw) Object.assign(s, JSON.parse(raw));
+          } catch (e) {}
+          $startup.checked = s.openOnStartup !== false;
+        }
+        $startup.addEventListener('change', function () {
+          try {
+            PluginAPI.persistDataSynced(JSON.stringify({ openOnStartup: $startup.checked }), SETTINGS_KEY);
+          } catch (e) {}
+        });
+
+        // ---------- hooks ----------
+        try {
+          var H = PluginAPI.Hooks || {};
+          PluginAPI.registerHook(H.DATA_CHANGED || 'dataChanged', scheduleReload);
+          PluginAPI.registerHook(H.DAY_CHANGE || 'dayChange', function () {
+            scheduleReload(true);
+          });
+          PluginAPI.registerHook(H.LANGUAGE_CHANGE || 'languageChange', function () {
+            loadLanguage().then(function () {
+              render();
+            });
+          });
+        } catch (e) {
+          console.warn('[Dashboard] registerHook failed', e);
+        }
+        var resizeTimer = null;
+        var lastW = innerWidth;
+        window.addEventListener('resize', function () {
+          clearTimeout(resizeTimer);
+          resizeTimer = setTimeout(function () {
+            if (!model || innerWidth === lastW) return;
+            lastW = innerWidth;
+            var colors = lastColors();
+            renderBurndown(colors);
+            renderHeatmap();
+          }, 150);
+        });
+        // The greeting depends on the hour; refresh it now and then.
+        setInterval(function () {
+          if (model) {
+            renderHero(lastColors());
+            runArcs($('hero'));
+            runCounters($('hero'));
+          }
+        }, 10 * 60 * 1000);
+        loadSettings();
+        loadLanguage().then(function () {
+          load(true);
+        });
+      })();
+    </script>
+  </body>
+</html>

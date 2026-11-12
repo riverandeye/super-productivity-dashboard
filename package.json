@@ -1,0 +1,16 @@
+{
+  "name": "sp-dashboard",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Super Productivity plugin: goal progress dashboard that replaces Today as the home screen",
+  "license": "MIT",
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "test": "node --test test/*.test.mjs"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/riverandeye/super-productivity-dashboard.git"
+  },
+  "homepage": "https://github.com/riverandeye/super-productivity-dashboard#readme"
+}

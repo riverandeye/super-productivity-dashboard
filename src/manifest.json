@@ -1,0 +1,20 @@
+{
+  "id": "goal-dashboard",
+  "name": "Dashboard",
+  "manifestVersion": 1,
+  "version": "1.0.0",
+  "minSupVersion": "20.0.0",
+  "description": "Goal progress dashboard and home screen: per-project completion rings, days of effort, today's contribution, pace vs plan, burndown, check-in heatmap, and today's planned items you can check off.",
+  "author": "riverandeye",
+  "homepage": "https://github.com/riverandeye/super-productivity-dashboard",
+  "hooks": ["dataChanged", "dayChange", "languageChange"],
+  "permissions": ["getTasks", "getArchivedTasks", "getAllProjects", "updateTask", "showIndexHtmlAsView", "persistDataSynced"],
+  "dataSharing": [],
+  "iFrame": true,
+  "sidePanel": false,
+  "uiKit": false,
+  "type": "standard",
+  "assets": [],
+  "icon": "icon.svg",
+  "i18n": { "languages": ["en", "ko"] }
+}
