@@ -31,7 +31,7 @@ English, light (demo data):
 
 ## Install
 
-1. Get the ZIP: [`release/goal-dashboard-1.1.0.zip`](https://github.com/riverandeye/super-productivity-dashboard/raw/main/release/goal-dashboard-1.1.0.zip)
+1. Get the ZIP: [`release/goal-dashboard-1.2.0.zip`](https://github.com/riverandeye/super-productivity-dashboard/raw/main/release/goal-dashboard-1.2.0.zip)
    (or build it with `npm run build`; only Node and the system `zip` command are needed).
 2. In the app, open **Settings → Plugins → Install Plugin** (Choose Plugin File) and pick the ZIP.
 3. Confirm the install warning, then **turn the plugin on** with its switch in the plugin list (uploaded plugins
@@ -73,9 +73,10 @@ Sections, all for the selected project:
   ring is what today's planned items would add; the thin inner ring shows how much of the plan's time has passed.
   D-day and pace badges sit under the ring.
 - **Burndown**: items left per day, plan (dashed) vs actual (area), a projection to the projected finish, and a
-  today line. Hover for daily numbers.
+  today line. The last date is always labelled at the right end. Hover for daily numbers.
 - **Check-in calendar**: GitHub-style heatmap of checks per day. Future days are outlined by how many items are
-  planned for them.
+  planned for them. Click a day to list its items under the calendar: what was checked that day, and what was
+  planned for it (done on another day, missed, or still planned). Click it again or × to close.
 - **Tasks**: progress bar per top-level task (e.g. per book), in the project's order, with its planned date range.
   Click a title to open the task.
 - **Today**: today's planned leaves with their parent task, and items checked today. Check them off right there

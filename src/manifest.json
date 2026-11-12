@@ -2,7 +2,7 @@
   "id": "goal-dashboard",
   "name": "Dashboard",
   "manifestVersion": 1,
-  "version": "1.1.0",
+  "version": "1.2.0",
   "minSupVersion": "20.0.0",
   "description": "Goal progress dashboard and home screen: per-project completion rings, days of effort, today's contribution, pace vs plan, burndown, check-in heatmap, and today's planned items you can check off.",
   "author": "riverandeye",

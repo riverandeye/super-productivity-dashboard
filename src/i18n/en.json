@@ -84,5 +84,17 @@
   "TASKS_SUB": "{{n}} tasks",
   "OF_TODAY": "of +{{n}} planned today",
   "PACE_HINT": "{{done}} done of {{due}} planned before today",
-  "PLAN_MARK": "Where the plan expects you today"
+  "PLAN_MARK": "Where the plan expects you today",
+  "DAY_HINT": "Click a day to see its items",
+  "DAY_SUMMARY": "{{checked}} checked · {{planned}} planned",
+  "DAY_EMPTY": "Nothing checked or planned on this day.",
+  "DAY_PLANNED_ON": "planned {{date}}",
+  "DAY_CHECKED_ON": "checked {{date}}",
+  "DAY_MISSED": "not done yet",
+  "CLOSE": "Close",
+  "ARCHIVED": "archived",
+  "DAY_STATE_DONE": "Checked",
+  "DAY_STATE_DONE_OTHER": "Done",
+  "DAY_STATE_MISSED": "Missed",
+  "DAY_STATE_PLANNED": "Planned"
 }

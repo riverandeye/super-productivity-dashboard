@@ -183,3 +183,19 @@ test('per-project heat, streak and task rows in project order', () => {
   assert.equal(q.bestStreak, 1);
   assert.deepEqual(p.todayItems.map((l) => l.id), ['b'], 'checked today, unplanned');
 });
+
+test('checks per project keep each checked task with its day', () => {
+  const m = L.buildModel({
+    todayStr: '2026-11-12',
+    projects,
+    tasks: [
+      task({ id: 'a', title: 'Book', isDone: true, doneOn: at('2026-11-10'), subTaskIds: ['a1'] }),
+      task({ id: 'a1', parentId: 'a', title: 'Ch 1', isDone: true, doneOn: at('2026-11-10'), dueDay: '2026-11-09' }),
+    ],
+  });
+  const c = m.projects[0].checks.sort((x, y) => x.id.localeCompare(y.id));
+  assert.deepEqual(c.map((x) => [x.id, x.day, x.parentTitle, x.plan]), [
+    ['a', D('2026-11-10'), null, null],
+    ['a1', D('2026-11-10'), 'Book', D('2026-11-09')],
+  ]);
+});

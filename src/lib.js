@@ -113,6 +113,14 @@
       if (dd != null) {
         s.days[dd] = true;
         s.heat[dd] = (s.heat[dd] || 0) + 1;
+        s.checks.push({
+          id: t.id,
+          title: t.title || '',
+          parentTitle: parent ? parent.t.title || '' : null,
+          day: dd,
+          plan: planDayOf(t),
+          archived: e.archived,
+        });
         allDays[dd] = true;
         heat[dd] = (heat[dd] || 0) + 1;
       }
@@ -253,6 +261,7 @@
       overdue: [],
       heat: {},
       heatPlan: {},
+      checks: [],
       taskRows: {},
       taskOrder: [],
     };

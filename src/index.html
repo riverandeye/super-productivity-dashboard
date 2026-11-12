@@ -792,6 +792,10 @@
         font-size: 11px;
         font-family: var(--font);
       }
+      .bd-axis text.bd-end {
+        fill: var(--muted);
+        font-weight: 700;
+      }
       .bd-grid line {
         stroke: var(--line);
       }
@@ -962,6 +966,162 @@
       .cell.today {
         outline: 2px solid #f472b6;
         outline-offset: 1px;
+      }
+      .cell {
+        cursor: pointer;
+      }
+      .cell.sel {
+        outline: 2px solid var(--text);
+        outline-offset: 2px;
+        z-index: 1;
+      }
+      .hm-legend .grow {
+        flex: 1;
+      }
+      .hm-hint {
+        color: var(--faint);
+      }
+      .day-detail {
+        display: none;
+        margin-top: 16px;
+        padding: 16px 18px;
+        border-radius: 16px;
+        background: var(--card-hi);
+        border: 1px solid var(--line);
+        border-top: 2px solid var(--pc);
+      }
+      .day-detail.open {
+        display: block;
+      }
+      .dd-in {
+        animation: ddin 0.45s var(--ease);
+      }
+      @keyframes ddin {
+        from {
+          opacity: 0;
+          transform: translateY(-6px);
+        }
+        to {
+          opacity: 1;
+          transform: none;
+        }
+      }
+      .dd-head {
+        display: flex;
+        align-items: flex-start;
+        gap: 12px;
+        justify-content: space-between;
+      }
+      .dd-date {
+        font-size: 15px;
+        font-weight: 800;
+        letter-spacing: -0.01em;
+      }
+      .dd-sub {
+        margin-top: 2px;
+        font-size: 12px;
+        color: var(--muted);
+      }
+      .dd-close {
+        border: 1px solid var(--line);
+        background: transparent;
+        color: var(--muted);
+        width: 28px;
+        height: 28px;
+        border-radius: 50%;
+        cursor: pointer;
+        font-size: 16px;
+        line-height: 1;
+        flex: none;
+      }
+      .dd-close:hover {
+        color: var(--text);
+        border-color: var(--line-strong);
+      }
+      .dd-empty {
+        margin-top: 12px;
+        color: var(--muted);
+        font-size: 13px;
+      }
+      .dd-list {
+        list-style: none;
+        margin: 12px 0 0;
+        padding: 0;
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: 8px 18px;
+      }
+      .dd-item {
+        display: grid;
+        grid-template-columns: 22px minmax(0, 1fr) auto;
+        gap: 10px;
+        align-items: center;
+        padding: 6px 0;
+        border-bottom: 1px solid var(--line);
+      }
+      .dd-ico {
+        width: 22px;
+        height: 22px;
+        border-radius: 50%;
+        display: grid;
+        place-items: center;
+        font-size: 12px;
+        font-weight: 900;
+        border: 2px solid var(--line-strong);
+        color: #fff;
+      }
+      .dd-item.done .dd-ico {
+        border-color: transparent;
+        background: linear-gradient(135deg, var(--pc), var(--pc2));
+        box-shadow: 0 4px 12px -4px var(--pc-glow);
+      }
+      .dd-item.done-other .dd-ico {
+        border-color: var(--pc-line);
+        color: var(--pc);
+      }
+      .dd-item.missed .dd-ico {
+        border-color: rgba(251, 113, 133, 0.6);
+        color: var(--bad);
+      }
+      .dd-item.planned .dd-ico {
+        border-style: dashed;
+        border-color: var(--pc2);
+      }
+      .dd-main {
+        min-width: 0;
+      }
+      .dd-title {
+        font-size: 13px;
+        font-weight: 650;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+      .dd-title.link {
+        cursor: pointer;
+      }
+      .dd-title.link:hover {
+        text-decoration: underline;
+        text-decoration-color: var(--faint);
+      }
+      .dd-meta {
+        font-size: 11.5px;
+        color: var(--muted);
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+      .dd-state {
+        font-size: 11px;
+        font-weight: 700;
+        color: var(--muted);
+        white-space: nowrap;
+      }
+      .dd-item.done .dd-state {
+        color: var(--pc);
+      }
+      .dd-item.missed .dd-state {
+        color: var(--bad);
       }
       .hm-legend {
         display: flex;
@@ -1760,6 +1920,7 @@
             sessionStorage.setItem(SEL_KEY, id);
           } catch (e) {}
           ui.showAllOverdue = false;
+          selDay = null;
           render(true);
         }
 
@@ -1962,17 +2123,21 @@
             var v = Math.round((b.total * i) / steps);
             svg += '<text x="' + (BD.l - 8) + '" y="' + (s.y(v) + 4) + '" text-anchor="end">' + v + '</text>';
           }
+          // Ticks on month or week starts; the last day is always labelled at
+          // the right end, so ticks too close to it are skipped.
           var span = b.end - b.start;
           var lastX = -999;
-          for (var d = b.start; d <= b.end; d++) {
+          var endX = s.x(b.end);
+          for (var d = b.start; d < b.end; d++) {
             var dt = new Date(d * L.DAY_MS);
             var mark = span > 120 ? dt.getUTCDate() === 1 : span > 30 ? L.dow(d) === 1 : true;
             if (!mark) continue;
             var x = s.x(d);
-            if (x - lastX < 56) continue;
+            if (x - lastX < 56 || endX - x < 70) continue;
             lastX = x;
             svg += '<text x="' + x + '" y="' + (BD.h - 8) + '" text-anchor="middle">' + esc(fmtShort(d)) + '</text>';
           }
+          svg += '<text class="bd-end" x="' + endX + '" y="' + (BD.h - 8) + '" text-anchor="end">' + esc(fmtShort(b.end)) + '</text>';
           svg += '</g>';
           var planPts = [[s.x(b.start), s.y(b.total)]];
           b.plan.forEach(function (v, k) {
@@ -2095,14 +2260,28 @@
               if (d > today) cls += ' future' + (pl ? ' p' + (pl >= 6 ? 3 : pl >= 3 ? 2 : 1) : '');
               else if (n) cls += ' l' + (n >= 10 ? 4 : n >= 5 ? 3 : n >= 2 ? 2 : 1);
               if (d === today) cls += ' today';
+              if (d === selDay) cls += ' sel';
               var delay = Math.min(1.2, w * 0.022 + k * 0.012);
               html += '<div class="' + cls + '" data-d="' + d + '" style="grid-column:' + (w + 2) + ';grid-row:' + (k + 2) + ';animation-delay:' + delay.toFixed(3) + 's"></div>';
             }
           }
           html += '</div></div>';
           html += '<div class="hm-legend">' + esc(t('LESS')) + ' <span class="cell"></span><span class="cell l1"></span><span class="cell l2"></span><span class="cell l3"></span><span class="cell l4"></span> ' + esc(t('MORE'));
-          html += '<span class="sp"></span><span class="cell future p2"></span> ' + esc(t('PLANNED')) + '</div>';
+          html += '<span class="sp"></span><span class="cell future p2"></span> ' + esc(t('PLANNED')) + '<span class="grow"></span><span class="hm-hint">' + esc(t('DAY_HINT')) + '</span></div>';
+          html += '<div class="day-detail" id="dayDetail"></div>';
           card.innerHTML = html;
+          card.querySelectorAll('.hm .cell').forEach(function (el) {
+            el.addEventListener('click', function () {
+              var d = +el.getAttribute('data-d');
+              selDay = selDay === d ? null : d;
+              card.querySelectorAll('.hm .cell.sel').forEach(function (x) {
+                x.classList.remove('sel');
+              });
+              if (selDay != null) el.classList.add('sel');
+              renderDayDetail(true);
+            });
+          });
+          renderDayDetail(false);
           card.querySelectorAll('.hm .cell').forEach(function (el) {
             el.addEventListener('mouseenter', function () {
               var d = +el.getAttribute('data-d');
@@ -2119,6 +2298,82 @@
           var sc = $('hmScroll');
           var todayCell = card.querySelector('.cell.today');
           if (sc && todayCell) sc.scrollLeft = Math.max(0, todayCell.offsetLeft - sc.clientWidth * 0.6);
+        }
+
+        // ---------- day detail (under the calendar) ----------
+        var selDay = null;
+        function renderDayDetail(animate) {
+          var box = $('dayDetail');
+          if (!box) return;
+          if (selDay == null || !cur) {
+            box.innerHTML = '';
+            box.classList.remove('open');
+            return;
+          }
+          var d = selDay;
+          var checked = cur.checks
+            .filter(function (c) {
+              return c.day === d;
+            })
+            .sort(function (a, b) {
+              return (a.parentTitle || '').localeCompare(b.parentTitle || '') || a.title.localeCompare(b.title);
+            });
+          var seen = {};
+          checked.forEach(function (c) {
+            seen[c.id] = true;
+          });
+          var planned = cur.leaves.filter(function (l) {
+            return l.plan === d && !seen[l.id];
+          });
+          var html = '<div class="dd-head"><div><div class="dd-date">' + esc(dfmt({ weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }, d)) + '</div>';
+          html += '<div class="dd-sub">' + esc(t('DAY_SUMMARY', { checked: checked.length, planned: planned.length + checked.filter(function (c) { return c.plan === d; }).length })) + '</div></div>';
+          html += '<button class="dd-close" id="ddClose" aria-label="' + esc(t('CLOSE')) + '" title="' + esc(t('CLOSE')) + '">×</button></div>';
+          if (!checked.length && !planned.length) {
+            html += '<div class="dd-empty">' + esc(t('DAY_EMPTY')) + '</div>';
+          } else {
+            html += '<ul class="dd-list">';
+            checked.forEach(function (c) {
+              var note = c.plan != null && c.plan !== d ? t('DAY_PLANNED_ON', { date: fmtShort(c.plan) }) : '';
+              html += ddItem(c.id, c.title, c.parentTitle, 'done', note, c.archived);
+            });
+            planned.forEach(function (l) {
+              var st = l.done ? 'done-other' : d < model.today ? 'missed' : 'planned';
+              var note = l.done && l.doneDay != null ? t('DAY_CHECKED_ON', { date: fmtShort(l.doneDay) }) : st === 'missed' ? t('DAY_MISSED') : '';
+              html += ddItem(l.id, l.title, l.parentTitle, st, note, l.archived);
+            });
+            html += '</ul>';
+          }
+          box.innerHTML = html;
+          box.classList.add('open');
+          if (animate) {
+            box.classList.remove('dd-in');
+            void box.offsetWidth;
+            box.classList.add('dd-in');
+          }
+          $('ddClose').addEventListener('click', function () {
+            selDay = null;
+            document.querySelectorAll('.hm .cell.sel').forEach(function (x) {
+              x.classList.remove('sel');
+            });
+            renderDayDetail(false);
+          });
+          box.querySelectorAll('[data-open]').forEach(function (el) {
+            el.addEventListener('click', function () {
+              if (typeof PluginAPI.selectTask === 'function') PluginAPI.selectTask(el.getAttribute('data-open')).catch(function () {});
+            });
+          });
+        }
+        function ddItem(id, title, parentTitle, state, note, archived) {
+          var icon = state === 'done' ? '✓' : state === 'done-other' ? '✓' : state === 'missed' ? '!' : '';
+          var h = '<li class="dd-item ' + state + '"><span class="dd-ico">' + icon + '</span><div class="dd-main">';
+          h += '<div class="dd-title' + (archived ? '' : ' link') + '"' + (archived ? '' : ' data-open="' + esc(id) + '" title="' + esc(t('OPEN_TASK')) + '"') + '>' + esc(title || t('UNTITLED')) + '</div>';
+          var sub = [];
+          if (parentTitle) sub.push(esc(parentTitle));
+          if (note) sub.push(esc(note));
+          if (archived) sub.push(esc(t('ARCHIVED')));
+          if (sub.length) h += '<div class="dd-meta">' + sub.join(' · ') + '</div>';
+          h += '</div><span class="dd-state">' + esc(t('DAY_STATE_' + state.toUpperCase().replace('-', '_'))) + '</span></li>';
+          return h;
         }
 
         // ---------- tasks ----------

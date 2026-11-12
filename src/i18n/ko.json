@@ -84,5 +84,17 @@
   "TASKS_SUB": "{{n}}개",
   "OF_TODAY": "오늘 계획 +{{n}} 중",
   "PACE_HINT": "오늘 전 계획 {{due}}개 중 {{done}}개 완료",
-  "PLAN_MARK": "계획상 오늘까지 와 있어야 할 위치"
+  "PLAN_MARK": "계획상 오늘까지 와 있어야 할 위치",
+  "DAY_HINT": "날짜를 누르면 그날 항목이 보여요",
+  "DAY_SUMMARY": "체크 {{checked}}개 · 계획 {{planned}}개",
+  "DAY_EMPTY": "이날 체크하거나 계획한 항목이 없어요.",
+  "DAY_PLANNED_ON": "{{date}} 계획",
+  "DAY_CHECKED_ON": "{{date}} 체크",
+  "DAY_MISSED": "아직 안 함",
+  "CLOSE": "닫기",
+  "ARCHIVED": "보관됨",
+  "DAY_STATE_DONE": "체크",
+  "DAY_STATE_DONE_OTHER": "완료",
+  "DAY_STATE_MISSED": "놓침",
+  "DAY_STATE_PLANNED": "계획"
 }
