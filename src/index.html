@@ -7,7 +7,12 @@
     <style>
       :root {
         --font: var(--font-primary-stack, system-ui, -apple-system, 'Segoe UI', Roboto, 'Apple SD Gothic Neo', sans-serif);
-        --grad: linear-gradient(120deg, #8b5cf6 0%, #22d3ee 55%, #f472b6 100%);
+        --pc: #8b5cf6;
+        --pc2: #22d3ee;
+        --pc-soft: rgba(139, 92, 246, 0.16);
+        --pc-line: rgba(139, 92, 246, 0.45);
+        --pc-glow: rgba(139, 92, 246, 0.65);
+        --grad: linear-gradient(120deg, var(--pc) 0%, var(--pc2) 60%, #f472b6 120%);
         --good: #34d399;
         --bad: #fb7185;
         --warn: #fbbf24;
@@ -96,12 +101,13 @@
       .aurora i:nth-child(1) {
         left: -18vmax;
         top: -26vmax;
-        background: radial-gradient(circle, var(--glow-a), transparent 65%);
+        background: radial-gradient(circle, color-mix(in srgb, var(--pc) 32%, transparent), transparent 65%);
+        transition: background 0.8s;
       }
       .aurora i:nth-child(2) {
         right: -22vmax;
         top: -10vmax;
-        background: radial-gradient(circle, var(--glow-b), transparent 65%);
+        background: radial-gradient(circle, color-mix(in srgb, var(--pc2) 22%, transparent), transparent 65%);
         animation-duration: 32s;
         animation-delay: -8s;
       }
@@ -239,7 +245,7 @@
         width: 520px;
         height: 520px;
         border-radius: 50%;
-        background: conic-gradient(from 0deg, rgba(139, 92, 246, 0.0), rgba(139, 92, 246, 0.18), rgba(34, 211, 238, 0.14), rgba(244, 114, 182, 0.12), rgba(139, 92, 246, 0));
+        background: conic-gradient(from 0deg, transparent, color-mix(in srgb, var(--pc) 22%, transparent), color-mix(in srgb, var(--pc2) 16%, transparent), rgba(244, 114, 182, 0.1), transparent);
         filter: blur(40px);
         animation: spin 24s linear infinite;
         pointer-events: none;
@@ -278,6 +284,7 @@
       }
       .greet {
         margin: 10px 0 6px;
+        padding-bottom: 0.08em;
         font-size: clamp(28px, 3.4vw, 44px);
         font-weight: 800;
         letter-spacing: -0.03em;
@@ -380,7 +387,7 @@
         opacity: 0.85;
       }
       .kpi.k-today .val {
-        background: linear-gradient(120deg, #22d3ee, #a78bfa);
+        background: linear-gradient(120deg, var(--pc2), var(--pc));
         -webkit-background-clip: text;
         background-clip: text;
         color: transparent;
@@ -456,7 +463,7 @@
         margin-top: 6px;
         font-size: 12px;
         font-weight: 700;
-        color: #22d3ee;
+        color: var(--pc2);
       }
       .ring-legend {
         display: flex;
@@ -494,123 +501,195 @@
         }
       }
 
-      /* ---------- project cards ---------- */
-      .pgrid {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
-        gap: 16px;
+      /* ---------- project selector ---------- */
+      .selector {
+        display: flex;
+        gap: 10px;
+        overflow-x: auto;
+        padding: 2px 2px 14px;
+        margin-bottom: 8px;
+        scrollbar-width: none;
       }
-      .pcard {
-        position: relative;
-        display: grid;
-        grid-template-columns: 116px minmax(0, 1fr);
-        gap: 16px;
-        align-items: center;
-        padding: 18px;
-        border-radius: 18px;
-        background: var(--card-hi);
-        border: 1px solid var(--line);
-        overflow: hidden;
-        transition: transform 0.35s var(--ease), border-color 0.35s, box-shadow 0.35s;
+      .selector::-webkit-scrollbar {
+        display: none;
       }
-      .pcard::after {
-        content: '';
-        position: absolute;
-        inset: 0;
-        background: radial-gradient(260px 140px at 0% 0%, var(--pc-soft), transparent 70%);
-        pointer-events: none;
-      }
-      .pcard:hover {
-        transform: translateY(-3px);
-        border-color: var(--pc-line);
-        box-shadow: 0 18px 40px -22px var(--pc-glow);
-      }
-      .pring {
-        position: relative;
-        width: 116px;
-        height: 116px;
-        z-index: 1;
-      }
-      .pring svg {
-        width: 100%;
-        height: 100%;
-        overflow: visible;
-      }
-      .pring .pct {
-        position: absolute;
-        inset: 0;
+      .sel {
+        flex: none;
         display: flex;
         align-items: center;
-        justify-content: center;
-        font-size: 24px;
-        font-weight: 850;
-        letter-spacing: -0.03em;
+        gap: 10px;
+        padding: 8px 16px 8px 9px;
+        border-radius: 999px;
+        border: 1px solid var(--line);
+        background: var(--card);
+        backdrop-filter: blur(14px);
+        -webkit-backdrop-filter: blur(14px);
+        cursor: pointer;
+        text-align: left;
+        max-width: 280px;
+        transition: transform 0.3s var(--ease), border-color 0.3s, box-shadow 0.3s, background 0.3s;
+      }
+      .sel:hover {
+        transform: translateY(-2px);
+        border-color: var(--pc-line);
+      }
+      .sel.on {
+        border-color: var(--pc);
+        background: linear-gradient(120deg, var(--pc-soft), transparent 80%), var(--card);
+        box-shadow: 0 10px 28px -12px var(--pc-glow), inset 0 0 0 1px var(--pc-line);
+      }
+      .sel.empty-p {
+        opacity: 0.6;
+      }
+      .sel-ring {
+        width: 34px;
+        height: 34px;
+        flex: none;
+      }
+      .sel-ring svg {
+        width: 100%;
+        height: 100%;
+      }
+      .sel-txt {
+        display: flex;
+        flex-direction: column;
+        min-width: 0;
+      }
+      .sel-title {
+        font-size: 13px;
+        font-weight: 750;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+      .sel-sub {
+        font-size: 11px;
+        color: var(--muted);
+        font-weight: 600;
+        white-space: nowrap;
         font-variant-numeric: tabular-nums;
       }
-      .pring .pct small {
-        font-size: 12px;
-        margin-left: 1px;
-        font-weight: 750;
-        opacity: 0.75;
+      .sel.on .sel-sub {
+        color: var(--text);
+        opacity: 0.8;
       }
-      .pbody {
+      .swap-in {
+        animation: swapin 0.6s var(--ease);
+      }
+      @keyframes swapin {
+        from {
+          opacity: 0.25;
+          transform: translateY(8px);
+        }
+        to {
+          opacity: 1;
+          transform: none;
+        }
+      }
+      .hero-main {
         position: relative;
         z-index: 1;
         min-width: 0;
       }
-      .ptitle {
+      .ring-badges {
         display: flex;
-        align-items: flex-start;
         gap: 8px;
-        font-size: 15.5px;
-        font-weight: 750;
-        letter-spacing: -0.01em;
-        line-height: 1.25;
+        align-items: center;
+        justify-content: center;
+        flex-wrap: wrap;
       }
-      .ptitle span:first-child {
-        display: -webkit-box;
-        -webkit-line-clamp: 2;
-        -webkit-box-orient: vertical;
+      .dday {
+        padding: 3px 11px;
+        border-radius: 999px;
+        font-size: 12px;
+        font-weight: 850;
+        color: #fff;
+        background: linear-gradient(120deg, var(--pc), var(--pc2));
+        box-shadow: 0 6px 18px -6px var(--pc-glow);
+        font-variant-numeric: tabular-nums;
+        letter-spacing: 0.02em;
+      }
+      .ring-note {
+        font-size: 11px;
+        color: var(--faint);
+      }
+
+      /* ---------- tasks ---------- */
+      .trows {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+        gap: 12px 22px;
+      }
+      .trow-top {
+        display: flex;
+        align-items: baseline;
+        gap: 10px;
+        font-size: 13px;
+      }
+      .trow-title {
+        flex: 1;
+        min-width: 0;
+        font-weight: 650;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+      .trow-title.link {
+        cursor: pointer;
+      }
+      .trow-title.link:hover {
+        text-decoration: underline;
+        text-decoration-color: var(--faint);
+      }
+      .trow-num {
+        font-size: 12px;
+        color: var(--muted);
+        font-variant-numeric: tabular-nums;
+        white-space: nowrap;
+      }
+      .trow-num b {
+        color: var(--text);
+      }
+      .trow.full .trow-num {
+        color: var(--good);
+      }
+      .trow-bar {
+        position: relative;
+        margin-top: 6px;
+        height: 7px;
+        border-radius: 99px;
+        background: var(--track);
         overflow: hidden;
       }
-      .ptitle .dday {
-        flex: none;
-        margin-left: auto;
-        padding: 2px 8px;
-        border-radius: 999px;
+      .trow-bar .fill {
+        position: absolute;
+        left: 0;
+        top: 0;
+        bottom: 0;
+        width: 0;
+        border-radius: 99px;
+        background: linear-gradient(90deg, var(--pc), var(--pc2));
+        box-shadow: 0 0 10px -1px var(--pc-glow);
+        transition: width 1.3s var(--ease);
+      }
+      .trow-bot {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 4px;
         font-size: 11px;
-        font-weight: 800;
-        color: #fff;
-        background: var(--pc);
-        box-shadow: 0 4px 14px -4px var(--pc-glow);
+        color: var(--faint);
         font-variant-numeric: tabular-nums;
       }
-      .pmeta {
-        margin-top: 8px;
-        display: flex;
-        flex-direction: column;
-        gap: 5px;
-        font-size: 12.5px;
+      .pace-stats {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+        margin-top: 16px;
+      }
+      .bd-stat .l2 {
+        font-size: 11px;
         color: var(--muted);
-      }
-      .pmeta .row {
-        display: flex;
-        align-items: flex-start;
-        gap: 7px;
-      }
-      .pmeta .row .ico {
         margin-top: 2px;
-      }
-      .pmeta .row b {
-        color: var(--text);
-        font-weight: 700;
-        font-variant-numeric: tabular-nums;
-      }
-      .ico {
-        width: 14px;
-        height: 14px;
-        flex: none;
-        opacity: 0.8;
       }
       .chips {
         display: flex;
@@ -852,33 +931,33 @@
         }
       }
       .cell.l1 {
-        background: rgba(139, 92, 246, 0.38);
+        background: color-mix(in srgb, var(--pc) 35%, transparent);
       }
       .cell.l2 {
-        background: rgba(139, 92, 246, 0.68);
+        background: color-mix(in srgb, var(--pc) 65%, transparent);
       }
       .cell.l3 {
-        background: #8b5cf6;
-        box-shadow: 0 0 10px -2px rgba(139, 92, 246, 0.8);
+        background: var(--pc);
+        box-shadow: 0 0 10px -2px var(--pc-glow);
       }
       .cell.l4 {
-        background: linear-gradient(135deg, #a78bfa, #22d3ee);
-        box-shadow: 0 0 12px -2px rgba(34, 211, 238, 0.9);
+        background: linear-gradient(135deg, var(--pc), var(--pc2));
+        box-shadow: 0 0 12px -2px var(--pc-glow);
       }
       .cell.future {
         background: transparent;
         box-shadow: inset 0 0 0 1px var(--line);
       }
       .cell.p1 {
-        box-shadow: inset 0 0 0 1.5px rgba(34, 211, 238, 0.35);
+        box-shadow: inset 0 0 0 1.5px color-mix(in srgb, var(--pc2) 40%, transparent);
       }
       .cell.p2 {
-        box-shadow: inset 0 0 0 1.5px rgba(34, 211, 238, 0.6);
-        background: rgba(34, 211, 238, 0.06);
+        box-shadow: inset 0 0 0 1.5px color-mix(in srgb, var(--pc2) 70%, transparent);
+        background: color-mix(in srgb, var(--pc2) 8%, transparent);
       }
       .cell.p3 {
-        box-shadow: inset 0 0 0 1.5px rgba(34, 211, 238, 0.9);
-        background: rgba(34, 211, 238, 0.12);
+        box-shadow: inset 0 0 0 1.5px var(--pc2);
+        background: color-mix(in srgb, var(--pc2) 16%, transparent);
       }
       .cell.today {
         outline: 2px solid #f472b6;
@@ -1358,19 +1437,17 @@
 
     <main class="wrap">
       <div class="err" id="err"></div>
-      <section class="card hero rise" id="hero"></section>
+      <nav class="selector rise" id="selector" aria-label="Projects"></nav>
+      <section class="card hero rise swap" style="animation-delay: 0.05s" id="hero"></section>
       <div class="grid">
         <div class="col">
-          <section class="card rise" style="animation-delay: 0.08s">
-            <div class="sec-head"><h2 data-i18n="PROJECTS"></h2><span class="sub" id="projSub"></span></div>
-            <div class="pgrid" id="projects"></div>
-          </section>
-          <section class="card rise" style="animation-delay: 0.16s" id="burndownCard"></section>
-          <section class="card rise" style="animation-delay: 0.24s" id="heatCard"></section>
+          <section class="card rise swap" style="animation-delay: 0.1s" id="burndownCard"></section>
+          <section class="card rise swap" style="animation-delay: 0.18s" id="heatCard"></section>
+          <section class="card rise swap" style="animation-delay: 0.24s" id="tasksCard"></section>
         </div>
         <div class="col">
-          <section class="card today-card rise" style="animation-delay: 0.12s" id="todayCard"></section>
-          <section class="card rise" style="animation-delay: 0.2s" id="paceCard"></section>
+          <section class="card today-card rise swap" style="animation-delay: 0.12s" id="todayCard"></section>
+          <section class="card rise swap" style="animation-delay: 0.2s" id="paceCard"></section>
         </div>
       </div>
       <div class="foot">
@@ -1633,31 +1710,107 @@
           down: '▼',
         };
 
+        // ---------- project selection ----------
+        // Default: the top project in the side menu. The app's menu order isn't
+        // in the plugin API, so read it (read-only) from the host's side nav
+        // when reachable, else fall back to getAllProjects() order. The pick is
+        // kept for this app session only, so each app start opens the top one.
+        var SEL_KEY = 'goal-dashboard-selected';
+        var selectedId = null;
+        try {
+          selectedId = sessionStorage.getItem(SEL_KEY);
+        } catch (e) {}
+        function menuOrder() {
+          var ids = [];
+          try {
+            window.parent.document.querySelectorAll('[data-project-id]').forEach(function (el) {
+              var id = el.getAttribute('data-project-id');
+              if (id && ids.indexOf(id) === -1) ids.push(id);
+            });
+          } catch (e) {}
+          return ids;
+        }
+        function orderedProjects() {
+          var order = menuOrder();
+          var pos = {};
+          order.forEach(function (id, i) {
+            pos[id] = i;
+          });
+          return model.projects
+            .map(function (p, i) {
+              return { p: p, k: p.id in pos ? pos[p.id] : 1e6 + i };
+            })
+            .sort(function (a, b) {
+              return a.k - b.k;
+            })
+            .map(function (x) {
+              return x.p;
+            });
+        }
+        function currentProject(list) {
+          var p = list.find(function (x) {
+            return x.id === selectedId;
+          });
+          return p || list[0] || null;
+        }
+        function select(id) {
+          if (id === selectedId) return;
+          selectedId = id;
+          try {
+            sessionStorage.setItem(SEL_KEY, id);
+          } catch (e) {}
+          ui.showAllOverdue = false;
+          render(true);
+        }
+
         // ---------- render ----------
-        function render() {
+        var cur = null; // selected project
+        var C = null; // its palette
+        function render(switched) {
           if (!model) return;
           uid = 0;
-          var colorOf = {};
-          model.projects.forEach(function (p, i) {
-            colorOf[p.id] = palette(p.color, i);
-          });
-          renderHero(colorOf);
-          renderProjects(colorOf);
-          renderBurndown(colorOf);
+          var list = orderedProjects();
+          cur = currentProject(list);
+          if (!cur) {
+            $('hero').innerHTML = '<div class="empty">' + esc(t('NO_GOALS')) + '</div>';
+            return;
+          }
+          var idx = model.projects.indexOf(cur);
+          C = palette(cur.color, idx);
+          applyAccent(C);
+          renderSelector(list);
+          renderHero();
+          renderBurndown();
           renderHeatmap();
-          renderToday(colorOf);
-          renderPace(colorOf);
+          renderTasks();
+          renderToday();
+          renderPace();
+          if (switched) {
+            document.querySelectorAll('.swap').forEach(function (el) {
+              el.classList.remove('rise', 'swap-in');
+              void el.offsetWidth;
+              el.classList.add('swap-in');
+            });
+          }
           runArcs(document.body);
           runCounters(document.body);
           requestAnimationFrame(function () {
             document.querySelectorAll('.kpi .bar[data-scale]').forEach(function (b) {
               b.style.transform = 'scaleX(' + b.getAttribute('data-scale') + ')';
             });
-            document.querySelectorAll('.pace-track .fill[data-w]').forEach(function (b) {
+            document.querySelectorAll('[data-w]').forEach(function (b) {
               b.style.width = b.getAttribute('data-w');
             });
           });
-          firstRender = false;
+        }
+        /** The selected project's color drives the page accents. */
+        function applyAccent(c) {
+          var r = document.documentElement.style;
+          r.setProperty('--pc', c.c);
+          r.setProperty('--pc2', c.c2);
+          r.setProperty('--pc-soft', c.soft);
+          r.setProperty('--pc-line', c.line);
+          r.setProperty('--pc-glow', c.glow);
         }
 
         function greeting() {
@@ -1667,67 +1820,85 @@
           if (h >= 18 && h < 24) return t('GREETING_EVENING');
           return t('GREETING_NIGHT');
         }
-
         function paceLabel(pace, long) {
           if (pace == null) return t('NO_PLAN');
           if (pace > 0) return t(long ? 'AHEAD_LONG' : 'AHEAD', { n: pace });
           if (pace < 0) return t(long ? 'BEHIND_LONG' : 'BEHIND', { n: -pace });
           return t('ON_TRACK');
         }
+        function paceCls(pace) {
+          return pace > 0 ? 'ahead' : pace < 0 ? 'behind' : 'track';
+        }
 
-        function renderHero(colorOf) {
-          var o = model.overall;
-          var remainingToday = o.plannedToday;
+        function renderSelector(list) {
+          var html = '';
+          list.forEach(function (p, i) {
+            var c = palette(p.color, model.projects.indexOf(p));
+            var on = p === cur;
+            html += '<button class="sel' + (on ? ' on' : '') + (p.total ? '' : ' empty-p') + '" data-sel="' + esc(p.id) + '" style="' + pcVars(c) + '" aria-pressed="' + on + '">';
+            html += '<span class="sel-ring"><svg viewBox="0 0 36 36">' + ringParts({ cx: 18, cy: 18, r: 14.5, w: 4, ratio: p.ratio, p: c, key: 'sel-' + p.id }) + '</svg></span>';
+            html += '<span class="sel-txt"><span class="sel-title">' + esc(p.title || t('UNTITLED')) + '</span>';
+            html += '<span class="sel-sub">' + (p.total ? esc(fmtNum(p.ratio * 100, p.ratio > 0 && p.ratio < 0.1 ? 1 : 0) + '%') + (p.plannedToday ? ' · ' + esc(t('TODAY_PTS', { n: t('PTS', { n: pts(p.todayGainPts) }) })) : '') : esc(t('NO_ITEMS'))) + '</span></span>';
+            html += '</button>';
+          });
+          var el = $('selector');
+          el.innerHTML = html;
+          el.querySelectorAll('[data-sel]').forEach(function (b) {
+            b.addEventListener('click', function () {
+              select(b.getAttribute('data-sel'));
+            });
+          });
+        }
+
+        function renderHero() {
+          var p = cur;
           var sub;
-          if (remainingToday > 0) sub = t('SUB_PLANNED', { n: remainingToday, pts: '<b>' + t('PTS', { n: pts(o.todayGainPts) }) + '</b>' });
-          else if (o.doneToday > 0) sub = t('SUB_ALL_DONE', { pts: '<b>' + t('PTS', { n: pts(o.gainedPts) }) + '</b>' });
+          if (p.plannedToday > 0) sub = t('SUB_PLANNED', { n: p.plannedToday, pts: '<b>' + esc(t('PTS', { n: pts(p.todayGainPts) })) + '</b>' });
+          else if (p.doneToday > 0) sub = t('SUB_ALL_DONE', { pts: '<b>' + esc(t('PTS', { n: pts(p.gainedPts) })) + '</b>' });
           else sub = t('SUB_NONE');
-          // escape everything except the <b> we inserted
           var dateStr = dfmt({ weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }, model.today);
 
-          var html = '<div style="position:relative;z-index:1;min-width:0">';
-          html += '<div class="eyebrow"><span class="dot"></span>' + esc(dateStr) + '</div>';
-          html += '<h1 class="greet"><span class="grad-text">' + esc(greeting()) + '</span></h1>';
+          var html = '<div class="hero-main">';
+          html += '<div class="eyebrow"><span class="dot"></span>' + esc(greeting()) + ' · ' + esc(dateStr) + '</div>';
+          html += '<h1 class="greet"><span class="grad-text">' + esc(p.title || t('UNTITLED')) + '</span></h1>';
           html += '<p class="hero-sub">' + sub + '</p>';
           html += '<div class="kpis">';
-          // days of effort
-          html += kpi('KPI_EFFORT', counter('effort', o.effortDays) + '<small>' + esc(t('DAYS_UNIT')) + '</small>', t('KPI_EFFORT_HINT'), null, '');
-          // completion
-          html += kpi('KPI_COMPLETION', counter('overallPct', o.ratio * 100, 1) + '<small>%</small>', t('KPI_COMPLETION_HINT', { done: fmtNum(o.done), total: fmtNum(o.total) }), o.ratio, '');
-          // today's contribution
-          html += kpi('KPI_TODAY', '+' + counter('todayPts', o.todayGainPts + o.gainedPts, 2) + '<small>' + (lang === 'ko' ? '%p' : 'pts') + '</small>', t('KPI_TODAY_HINT', { gained: t('PTS', { n: pts(o.gainedPts) }) }), null, 'k-today');
-          // streak
+          html += kpi('KPI_EFFORT', counter('effort', p.effortDays) + '<small>' + esc(t('DAYS_UNIT')) + '</small>', p.firstDay != null ? t('SINCE', { date: fmtLong(p.firstDay) }) : t('KPI_EFFORT_HINT'), null, '');
+          html += kpi('KPI_COMPLETION', counter('pct', p.ratio * 100, 1) + '<small>%</small>', t('KPI_COMPLETION_HINT', { done: fmtNum(p.done), total: fmtNum(p.total) }), p.ratio, '');
+          html += kpi('KPI_TODAY', '+' + counter('todayPts', p.todayGainPts + p.gainedPts, 2) + '<small>' + (lang === 'ko' ? '%p' : 'pts') + '</small>', t('KPI_TODAY_HINT', { gained: t('PTS', { n: pts(p.gainedPts) }) }), null, 'k-today');
           html += kpi(
             'KPI_STREAK',
-            '<span class="flame' + (o.checkedToday ? '' : ' off') + '">🔥</span> ' + counter('streak', o.streak) + '<small>' + esc(t('DAYS_UNIT')) + '</small>',
-            t('KPI_STREAK_HINT', { n: o.bestStreak }),
+            '<span class="flame' + (p.checkedToday ? '' : ' off') + '">🔥</span> ' + counter('streak', p.streak) + '<small>' + esc(t('DAYS_UNIT')) + '</small>',
+            t('KPI_STREAK_HINT', { n: p.bestStreak }),
             null,
             ''
           );
           html += '</div></div>';
 
-          // concentric rings, one per goal with items (outermost = first goal)
-          var ps = model.projects.filter(function (p) {
-            return p.total > 0;
-          });
-          var size = 280;
-          var w = ps.length > 4 ? 12 : 16;
-          var gap = ps.length > 4 ? 5 : 6;
-          var svg = '<svg viewBox="0 0 ' + size + ' ' + size + '">';
-          ps.forEach(function (p, i) {
-            var r = size / 2 - w / 2 - 4 - i * (w + gap);
-            if (r < 40) return;
-            svg += ringParts({ cx: size / 2, cy: size / 2, r: r, w: w, ratio: p.ratio, ghost: p.todayGainPts / 100, p: colorOf[p.id], key: 'hero-' + p.id });
-          });
+          // one big ring for the project
+          var size = 260;
+          var svg = '<svg viewBox="0 0 ' + size + ' ' + size + '">' + ringParts({ cx: size / 2, cy: size / 2, r: size / 2 - 18, w: 24, ratio: p.ratio, ghost: p.todayGainPts / 100, p: C, key: 'hero' });
+          // inner thin ring: share of the plan's time elapsed, when there is a plan
+          if (p.planStart != null && p.planEnd != null && p.done < p.total) {
+            var span = p.planEnd - p.planStart + 1;
+            var el = clamp01((model.today - p.planStart) / span);
+            svg += ringParts({ cx: size / 2, cy: size / 2, r: size / 2 - 44, w: 5, ratio: el, p: document.documentElement.getAttribute('data-theme') === 'light' ? { c: 'rgba(20,30,70,0.45)', c2: 'rgba(20,30,70,0.2)', soft: 'var(--track)' } : { c: 'rgba(255,255,255,0.55)', c2: 'rgba(255,255,255,0.25)', soft: 'var(--track)' }, key: 'heroTime' });
+          }
           svg += '</svg>';
           html += '<div class="hero-rings"><div class="rings-box">' + svg;
-          html += '<div class="rings-center"><div class="big">' + counter('overallPct2', o.ratio * 100, 1) + '<small>%</small></div><div class="cap">' + esc(t('OVERALL')) + '</div>';
-          if (o.todayGainPts > 0) html += '<div class="gain">' + esc(t('TODAY_PTS', { n: t('PTS', { n: pts(o.todayGainPts) }) })) + '</div>';
-          html += '</div></div><div class="ring-legend">';
-          ps.forEach(function (p) {
-            html += '<span><i style="background:' + colorOf[p.id].c + ';box-shadow:0 0 8px ' + colorOf[p.id].glow + '"></i>' + esc(p.title || t('UNTITLED')) + '</span>';
-          });
-          html += '</div></div>';
+          html += '<div class="rings-center"><div class="big">' + (p.total ? counter('pct2', p.ratio * 100, 1) + '<small>%</small>' : '–') + '</div>';
+          html += '<div class="cap">' + esc(t('ITEMS_DONE', { done: fmtNum(p.done), total: fmtNum(p.total) })) + '</div>';
+          if (p.todayGainPts > 0) html += '<div class="gain">' + esc(t('TODAY_PTS', { n: t('PTS', { n: pts(p.todayGainPts) }) })) + '</div>';
+          html += '</div></div><div class="ring-badges">';
+          if (p.planEnd != null && p.done < p.total) {
+            var dd = p.planEnd - model.today;
+            if (dd >= 0) html += '<span class="dday">' + esc(dd === 0 ? t('D_DAY_TODAY') : t('D_DAY', { n: dd })) + '</span>';
+          }
+          if (p.total && p.done === p.total) html += '<span class="chip ahead">✓ ' + esc(t('COMPLETE')) + '</span>';
+          else if (p.pace != null) html += '<span class="chip ' + paceCls(p.pace) + '">' + esc(paceLabel(p.pace)) + '</span>';
+          html += '</div>';
+          if (p.planStart != null && p.done < p.total) html += '<div class="ring-note">' + esc(t('RING_NOTE')) + '</div>';
+          html += '</div>';
           $('hero').innerHTML = html;
         }
         function kpi(labelKey, valHtml, hint, barRatio, cls) {
@@ -1738,103 +1909,28 @@
           );
         }
 
-        function renderProjects(colorOf) {
-          var html = '';
-          model.projects.forEach(function (p, i) {
-            var c = colorOf[p.id];
-            var C = 2 * Math.PI * 48;
-            html += '<div class="pcard rise" style="' + pcVars(c) + 'animation-delay:' + (0.1 + i * 0.06) + 's">';
-            html += '<div class="pring"><svg viewBox="0 0 116 116">' + ringParts({ cx: 58, cy: 58, r: 48, w: 11, ratio: p.ratio, ghost: p.todayGainPts / 100, p: c, key: 'p-' + p.id }) + '</svg>';
-            html += '<div class="pct">' + (p.total ? counter('pp-' + p.id, p.ratio * 100, p.ratio > 0 && p.ratio < 0.1 ? 1 : 0) + '<small>%</small>' : '–') + '</div></div>';
-            html += '<div class="pbody"><div class="ptitle"><span title="' + esc(p.title) + '">' + esc(p.title || t('UNTITLED')) + '</span>';
-            if (p.planEnd != null && p.done < p.total) {
-              var dd = p.planEnd - model.today;
-              if (dd >= 0) html += '<span class="dday">' + esc(dd === 0 ? t('D_DAY_TODAY') : t('D_DAY', { n: dd })) + '</span>';
-            }
-            html += '</div><div class="pmeta">';
-            if (!p.total) {
-              html += '<div class="row">' + esc(t('NO_ITEMS')) + '</div>';
-            } else {
-              html += '<div class="row">' + ICONS.cal + '<span>' + boldNum(t('EFFORT_DAYS', { n: p.effortDays }), p.effortDays) + '</span></div>';
-              html += '<div class="row">' + ICONS.check + '<span>' + boldNum(t('ITEMS_DONE', { done: fmtNum(p.done), total: fmtNum(p.total) }), null) + '</span></div>';
-              if (p.projectedEnd != null && p.done < p.total) {
-                html += '<div class="row">' + ICONS.flag + '<span>' + esc(t('PROJECTED')) + ' <b>' + esc(fmtLong(p.projectedEnd)) + '</b></span></div>';
-              }
-            }
-            html += '</div><div class="chips">';
-            if (p.total && p.done === p.total) html += '<span class="chip ahead">✓ ' + esc(t('COMPLETE')) + '</span>';
-            if (p.todayGainPts > 0) html += '<span class="chip today">' + esc(t('TODAY_PTS', { n: t('PTS', { n: pts(p.todayGainPts) }) })) + '</span>';
-            if (p.gainedPts > 0) html += '<span class="chip gained">' + esc(t('GAINED_PTS', { n: t('PTS', { n: pts(p.gainedPts) }) })) + '</span>';
-            if (p.pace != null && p.done < p.total) {
-              html += '<span class="chip ' + (p.pace > 0 ? 'ahead' : p.pace < 0 ? 'behind' : 'track') + '">' + (p.pace > 0 ? ICONS.up + ' ' : p.pace < 0 ? ICONS.down + ' ' : '● ') + esc(paceLabel(p.pace)) + '</span>';
-            }
-            html += '</div></div></div>';
-          });
-          $('projects').innerHTML = html;
-          $('projSub').textContent = '';
-        }
-        function boldNum(text, n) {
-          // bold the digits in a translated sentence
-          return esc(text).replace(/[\d,.]+(\s*\/\s*[\d,.]+)?/, function (m) {
-            return '<b>' + m + '</b>';
-          });
-        }
-
         // ---------- burndown ----------
-        function renderBurndown(colorOf) {
-          var dated = model.projects.filter(function (p) {
-            return p.burndown;
-          });
+        function renderBurndown() {
+          var p = cur;
           var card = $('burndownCard');
-          var html = '<div class="sec-head"><h2>' + esc(t('BURNDOWN')) + '</h2><span class="sub">' + esc(t('BURNDOWN_SUB')) + '</span><span class="grow"></span>';
-          if (!dated.length) {
-            card.innerHTML = html + '</div><div class="empty">' + esc(t('NO_BURNDOWN')) + '</div>';
+          var html = '<div class="sec-head"><h2>' + esc(t('BURNDOWN')) + '</h2><span class="sub">' + esc(t('BURNDOWN_SUB')) + '</span></div>';
+          if (!p.burndown) {
+            card.innerHTML = html + '<div class="empty">' + esc(t(p.total ? 'NO_BURNDOWN' : 'NO_ITEMS')) + '</div>';
             return;
           }
-          var sel = dated.find(function (p) {
-            return p.id === ui.burndown;
-          }) || dated[0];
-          if (dated.length > 1) {
-            html += '<div class="bd-tabs">';
-            dated.forEach(function (p) {
-              html += '<button class="bd-tab' + (p === sel ? ' on' : '') + '" data-bd="' + esc(p.id) + '"><i style="background:' + colorOf[p.id].c + '"></i>' + esc(p.title) + '</button>';
-            });
-            html += '</div>';
-          }
-          html += '</div>';
-          var c = colorOf[sel.id];
-          var b = sel.burndown;
+          var b = p.burndown;
           BD.w = Math.max(320, Math.round(card.clientWidth - 46));
-          // stats row
-          var paceCls = sel.pace > 0 ? 'good' : sel.pace < 0 ? 'bad' : '';
-          var shift = sel.projectedEnd != null ? sel.projectedEnd - sel.planEnd : null;
-          html += '<div class="bd-stats">';
-          html += '<div class="bd-stat"><div class="l">' + esc(t('KPI_PACE')) + '</div><div class="v ' + paceCls + '">' + esc(paceLabel(sel.pace, true)) + '</div></div>';
-          html += '<div class="bd-stat"><div class="l">' + esc(t('PLAN_END')) + '</div><div class="v">' + esc(fmtLong(sel.planEnd)) + '</div></div>';
-          html +=
-            '<div class="bd-stat"><div class="l">' + esc(t('PROJECTED')) + '</div><div class="v ' + (shift > 0 ? 'bad' : shift < 0 ? 'good' : '') + '">' +
-            (sel.projectedEnd != null ? esc(fmtLong(sel.projectedEnd)) : '–') +
-            '</div></div>';
-          html += '</div>';
-          html += '<div class="bd-wrap" style="' + pcVars(c) + '">' + burndownSvg(sel, c) + '</div>';
+          html += '<div class="bd-wrap">' + burndownSvg(p, C) + '</div>';
           html += '<div class="legend">';
-          html += '<span><svg viewBox="0 0 22 8"><line x1="0" y1="4" x2="22" y2="4" stroke="' + c.c2 + '" stroke-width="2" stroke-dasharray="4 3"/></svg>' + esc(t('LEGEND_PLAN')) + '</span>';
-          html += '<span><svg viewBox="0 0 22 8"><line x1="0" y1="4" x2="22" y2="4" stroke="' + c.c + '" stroke-width="3" stroke-linecap="round"/></svg>' + esc(t('LEGEND_ACTUAL')) + '</span>';
+          html += '<span><svg viewBox="0 0 22 8"><line x1="0" y1="4" x2="22" y2="4" stroke="' + C.c2 + '" stroke-width="2" stroke-dasharray="4 3"/></svg>' + esc(t('LEGEND_PLAN')) + '</span>';
+          html += '<span><svg viewBox="0 0 22 8"><line x1="0" y1="4" x2="22" y2="4" stroke="' + C.c + '" stroke-width="3" stroke-linecap="round"/></svg>' + esc(t('LEGEND_ACTUAL')) + '</span>';
           html += '<span><svg viewBox="0 0 22 8"><line x1="1" y1="4" x2="22" y2="4" style="stroke:var(--muted)" stroke-width="2" stroke-dasharray="1 4" stroke-linecap="round"/></svg>' + esc(t('LEGEND_PROJECTION')) + '</span>';
           html += '</div>';
           card.innerHTML = html;
-          card.querySelectorAll('[data-bd]').forEach(function (btn) {
-            btn.addEventListener('click', function () {
-              ui.burndown = btn.getAttribute('data-bd');
-              saveUi();
-              renderBurndown(colorOf);
-              runCounters(card);
-            });
-          });
-          bindBurndownHover(card, sel, c);
+          bindBurndownHover(card, p, C);
         }
 
-        var BD = { w: 900, h: 300, l: 44, r: 16, t: 14, b: 30 };
+        var BD = { w: 900, h: 280, l: 44, r: 16, t: 16, b: 30 };
         function bdScale(sel) {
           var b = sel.burndown;
           var span = Math.max(1, b.end - b.start);
@@ -1855,26 +1951,22 @@
           svg += '<defs><linearGradient id="' + id + 'a" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="' + c.c + '" stop-opacity="0.45"/><stop offset="1" stop-color="' + c.c + '" stop-opacity="0"/></linearGradient>';
           svg += '<linearGradient id="' + id + 'l" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="' + c.c + '"/><stop offset="1" stop-color="' + c.c2 + '"/></linearGradient>';
           svg += '<filter id="' + id + 'g"><feGaussianBlur stdDeviation="4"/></filter></defs>';
-          // grid + y labels
           svg += '<g class="bd-grid">';
           var steps = 4;
           for (var i = 0; i <= steps; i++) {
-            var v = Math.round((b.total * i) / steps);
-            var y = s.y(v);
+            var y = s.y(Math.round((b.total * i) / steps));
             svg += '<line x1="' + BD.l + '" x2="' + (BD.w - BD.r) + '" y1="' + y + '" y2="' + y + '"/>';
           }
           svg += '</g><g class="bd-axis">';
           for (i = 0; i <= steps; i++) {
-            v = Math.round((b.total * i) / steps);
+            var v = Math.round((b.total * i) / steps);
             svg += '<text x="' + (BD.l - 8) + '" y="' + (s.y(v) + 4) + '" text-anchor="end">' + v + '</text>';
           }
-          // x labels: month starts or week starts
           var span = b.end - b.start;
           var lastX = -999;
           for (var d = b.start; d <= b.end; d++) {
             var dt = new Date(d * L.DAY_MS);
             var mark = span > 120 ? dt.getUTCDate() === 1 : span > 30 ? L.dow(d) === 1 : true;
-            if (span <= 30 && (d - b.start) % Math.ceil(span / 8 || 1) !== 0) mark = false;
             if (!mark) continue;
             var x = s.x(d);
             if (x - lastX < 56) continue;
@@ -1882,18 +1974,15 @@
             svg += '<text x="' + x + '" y="' + (BD.h - 8) + '" text-anchor="middle">' + esc(fmtShort(d)) + '</text>';
           }
           svg += '</g>';
-          // plan line (step-ish polyline)
           var planPts = [[s.x(b.start), s.y(b.total)]];
           b.plan.forEach(function (v, k) {
             planPts.push([s.x(b.start + k), s.y(v)]);
           });
           svg += pathEl(planPts, 'bd-plan fade-in', 'stroke="' + c.c2 + '"');
-          // today marker
           var tx = s.x(model.today);
           svg += '<line x1="' + tx + '" x2="' + tx + '" y1="' + BD.t + '" y2="' + (BD.h - BD.b) + '" stroke="#f472b6" stroke-width="1.5" stroke-dasharray="3 4" opacity="0.8"/>';
           var tAnchor = tx < BD.l + 40 ? 'start' : tx > BD.w - BD.r - 40 ? 'end' : 'middle';
-          svg += '<text x="' + (tAnchor === 'start' ? tx + 4 : tAnchor === 'end' ? tx - 4 : tx) + '" y="' + (BD.t - 2) + '" text-anchor="' + tAnchor + '" fill="#f472b6" font-size="11" font-weight="700">' + esc(t('TODAY')) + '</text>';
-          // actual area + line
+          svg += '<text x="' + (tAnchor === 'start' ? tx + 4 : tAnchor === 'end' ? tx - 4 : tx) + '" y="' + (BD.t - 4) + '" text-anchor="' + tAnchor + '" fill="#f472b6" font-size="11" font-weight="700">' + esc(t('TODAY')) + '</text>';
           var act = [[s.x(b.start), s.y(b.total)]];
           b.actual.forEach(function (v, k) {
             act.push([s.x(b.start + k), s.y(v)]);
@@ -1903,7 +1992,6 @@
           svg += '<path class="fade-in" d="' + dPath(area) + 'Z" fill="url(#' + id + 'a)"/>';
           svg += pathEl(act, 'bd-actual draw', 'stroke="url(#' + id + 'l)" filter="url(#' + id + 'g)" opacity="0.6"');
           svg += pathEl(act, 'bd-actual draw', 'stroke="url(#' + id + 'l)"');
-          // projection
           if (sel.projectedEnd != null && sel.done < sel.total) {
             var pe = Math.min(sel.projectedEnd, b.end);
             var remaining = b.actual.length ? b.actual[b.actual.length - 1] : b.total;
@@ -1911,10 +1999,8 @@
             svg += pathEl([last, [s.x(pe), s.y(endV)]], 'bd-proj fade-in', 'style="stroke:var(--muted)"');
             svg += '<circle class="fade-in" cx="' + s.x(pe) + '" cy="' + s.y(endV) + '" r="4" style="fill:var(--card-solid);stroke:var(--muted)" stroke-width="2"/>';
           }
-          // live dot
           svg += '<circle cx="' + last[0] + '" cy="' + last[1] + '" r="9" fill="' + c.c + '" opacity="0.25"><animate attributeName="r" values="6;13;6" dur="2.4s" repeatCount="indefinite"/><animate attributeName="opacity" values="0.35;0;0.35" dur="2.4s" repeatCount="indefinite"/></circle>';
           svg += '<circle cx="' + last[0] + '" cy="' + last[1] + '" r="5" fill="' + c.c + '" style="stroke:var(--card-solid)" stroke-width="2"/>';
-          // hover guide
           svg += '<line id="bdHover" x1="0" x2="0" y1="' + BD.t + '" y2="' + (BD.h - BD.b) + '" style="display:none;stroke:var(--line-strong)" stroke-width="1"/>';
           svg += '</svg>';
           return svg;
@@ -1959,40 +2045,37 @@
 
         // ---------- heatmap ----------
         function renderHeatmap() {
+          var p = cur;
+          var heat = p.heat;
+          var heatPlan = p.heatPlan;
           var today = model.today;
           var card = $('heatCard');
           var avail = Math.max(300, card.clientWidth - 46 - 32);
-          var lastPlan0 = today;
-          Object.keys(model.heatPlan).forEach(function (d) {
-            if (+d > lastPlan0) lastPlan0 = +d;
-          });
-          var futureWeeks = Math.ceil((Math.min(lastPlan0, today + 7 * 26) - (today - L.dow(today))) / 7) + 1;
-          var CELL_MAX = 18;
-          var weeksBack = Math.max(17, Math.floor(avail / (CELL_MAX + 4)) - futureWeeks);
-          weeksBack = Math.min(weeksBack, 52);
-          var start = today - L.dow(today) - weeksBack * 7; // a Sunday
           var lastPlan = today;
-          Object.keys(model.heatPlan).forEach(function (d) {
+          Object.keys(heatPlan).forEach(function (d) {
             if (+d > lastPlan) lastPlan = +d;
           });
           var end = Math.min(lastPlan, today + 7 * 26);
           end = end + (6 - L.dow(end)); // through Saturday
+          var futureWeeks = Math.round((end - (today - L.dow(today)) + 1) / 7);
+          var CELL_MAX = 18;
+          var weeksBack = Math.min(52, Math.max(17, Math.floor(avail / (CELL_MAX + 4)) - futureWeeks));
+          var start = today - L.dow(today) - weeksBack * 7; // a Sunday
           var weeks = Math.round((end - start + 1) / 7);
           var cell = Math.max(10, Math.min(CELL_MAX, Math.floor(avail / weeks) - 4));
           var totalChecks = 0;
-          Object.keys(model.heat).forEach(function (d) {
-            if (+d >= start && +d <= today) totalChecks += model.heat[d];
+          Object.keys(heat).forEach(function (d) {
+            if (+d >= start && +d <= today) totalChecks += heat[d];
           });
           var html = '<div class="sec-head"><h2>' + esc(t('HEATMAP')) + '</h2><span class="sub">' + esc(t('HEATMAP_SUB', { n: totalChecks, w: weeksBack + 1 })) + '</span></div>';
           html += '<div class="hm-scroll" id="hmScroll"><div class="hm" style="--cell:' + cell + 'px;grid-template-columns: 28px">';
-          // weekday labels column
           html += '<div style="grid-row:1"></div>';
           for (var r = 0; r < 7; r++) {
             var lbl = r === 1 || r === 3 || r === 5 ? dfmt({ weekday: 'short' }, start + r) : '';
             html += '<div class="dlabel" style="grid-row:' + (r + 2) + '">' + esc(lbl) + '</div>';
           }
-          // Month labels: on the first week, and on every week holding a 1st.
-          // When week 1 holds a 1st, week 0's label would collide, so drop it.
+          // Month labels: on every week holding a 1st, and on the first week
+          // unless week 1 holds a 1st (the labels would collide).
           var labels = [];
           for (var w = 0; w < weeks; w++) {
             var ws0 = start + w * 7;
@@ -2006,14 +2089,11 @@
             html += '<div class="mlabel" style="grid-column:' + (w + 2) + '">' + esc(labels[w]) + '</div>';
             for (k = 0; k < 7; k++) {
               var d = ws + k;
-              var n = model.heat[d] || 0;
-              var p = model.heatPlan[d] || 0;
+              var n = heat[d] || 0;
+              var pl = heatPlan[d] || 0;
               var cls = 'cell';
-              if (d > today) {
-                cls += ' future' + (p ? ' p' + (p >= 6 ? 3 : p >= 3 ? 2 : 1) : '');
-              } else if (n) {
-                cls += ' l' + (n >= 10 ? 4 : n >= 5 ? 3 : n >= 2 ? 2 : 1);
-              }
+              if (d > today) cls += ' future' + (pl ? ' p' + (pl >= 6 ? 3 : pl >= 3 ? 2 : 1) : '');
+              else if (n) cls += ' l' + (n >= 10 ? 4 : n >= 5 ? 3 : n >= 2 ? 2 : 1);
               if (d === today) cls += ' today';
               var delay = Math.min(1.2, w * 0.022 + k * 0.012);
               html += '<div class="' + cls + '" data-d="' + d + '" style="grid-column:' + (w + 2) + ';grid-row:' + (k + 2) + ';animation-delay:' + delay.toFixed(3) + 's"></div>';
@@ -2023,58 +2103,88 @@
           html += '<div class="hm-legend">' + esc(t('LESS')) + ' <span class="cell"></span><span class="cell l1"></span><span class="cell l2"></span><span class="cell l3"></span><span class="cell l4"></span> ' + esc(t('MORE'));
           html += '<span class="sp"></span><span class="cell future p2"></span> ' + esc(t('PLANNED')) + '</div>';
           card.innerHTML = html;
-          card.querySelectorAll('.hm .cell').forEach(function (cell) {
-            cell.addEventListener('mouseenter', function (e) {
-              var d = +cell.getAttribute('data-d');
-              var n = model.heat[d] || 0;
-              var p = model.heatPlan[d] || 0;
+          card.querySelectorAll('.hm .cell').forEach(function (el) {
+            el.addEventListener('mouseenter', function () {
+              var d = +el.getAttribute('data-d');
+              var n = heat[d] || 0;
+              var pl = heatPlan[d] || 0;
               var h = '<b>' + esc(dfmt({ weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' }, d)) + '</b><br>';
-              h += d > model.today ? esc(t('TIP_PLANNED', { n: p })) : esc(n ? t('TIP_CHECKS', { n: n }) : t('TIP_NO_CHECKS'));
-              if (d === model.today && p) h += '<br>' + esc(t('TIP_PLANNED', { n: p }));
-              var r = cell.getBoundingClientRect();
-              showTip(h, r.left + r.width / 2, r.top);
+              h += d > model.today ? esc(t('TIP_PLANNED', { n: pl })) : esc(n ? t('TIP_CHECKS', { n: n }) : t('TIP_NO_CHECKS'));
+              if (d === model.today && pl) h += '<br>' + esc(t('TIP_PLANNED', { n: pl }));
+              var rc = el.getBoundingClientRect();
+              showTip(h, rc.left + rc.width / 2, rc.top);
             });
-            cell.addEventListener('mouseleave', hideTip);
+            el.addEventListener('mouseleave', hideTip);
           });
-          // keep today in view
           var sc = $('hmScroll');
           var todayCell = card.querySelector('.cell.today');
           if (sc && todayCell) sc.scrollLeft = Math.max(0, todayCell.offsetLeft - sc.clientWidth * 0.6);
+        }
+
+        // ---------- tasks ----------
+        function renderTasks() {
+          var p = cur;
+          var html = '<div class="sec-head"><h2>' + esc(t('TASKS')) + '</h2><span class="sub">' + esc(t('TASKS_SUB', { n: p.tasks.length })) + '</span></div>';
+          if (!p.tasks.length) {
+            $('tasksCard').innerHTML = html + '<div class="empty">' + esc(t('NO_ITEMS')) + '</div>';
+            return;
+          }
+          html += '<div class="trows">';
+          p.tasks.forEach(function (r) {
+            var full = r.total && r.done === r.total;
+            html += '<div class="trow' + (full ? ' full' : '') + '">';
+            html += '<div class="trow-top"><span class="trow-title" data-open="' + (r.archived ? '' : esc(r.id)) + '">' + esc(r.title || t('UNTITLED')) + '</span>';
+            html += '<span class="trow-num">' + (full ? '✓ ' : '') + '<b>' + fmtNum(r.done) + '</b> / ' + fmtNum(r.total) + '</span></div>';
+            html += '<div class="trow-bar"><div class="fill" data-w="' + (r.ratio * 100).toFixed(2) + '%"></div></div>';
+            var dates = '';
+            if (r.planStart != null) dates = r.planStart === r.planEnd ? fmtShort(r.planStart) : fmtShort(r.planStart) + ' – ' + fmtShort(r.planEnd);
+            html += '<div class="trow-bot"><span>' + esc(dates) + '</span><span>' + esc(fmtNum(r.ratio * 100) + '%') + '</span></div>';
+            html += '</div>';
+          });
+          html += '</div>';
+          var card = $('tasksCard');
+          card.innerHTML = html;
+          card.querySelectorAll('[data-open]').forEach(function (el) {
+            var id = el.getAttribute('data-open');
+            if (!id) return;
+            el.classList.add('link');
+            el.title = t('OPEN_TASK');
+            el.addEventListener('click', function () {
+              if (typeof PluginAPI.selectTask === 'function') PluginAPI.selectTask(id).catch(function () {});
+            });
+          });
         }
 
         // ---------- today ----------
         function itemDone(l) {
           return l.id in pending ? pending[l.id] : l.done;
         }
-        function renderToday(colorOf) {
-          var items = model.todayItems;
-          var o = model.overall;
+        function renderToday() {
+          var p = cur;
+          var items = p.todayItems;
           var total = items.length;
           var doneN = items.filter(itemDone).length;
           var ratio = total ? doneN / total : 0;
           var html = '<div class="today-head">';
-          var C = 2 * Math.PI * 21;
-          html += '<div class="mini-ring"><svg viewBox="0 0 52 52">' + ringParts({ cx: 26, cy: 26, r: 21, w: 6, ratio: ratio, p: { c: '#8b5cf6', c2: '#22d3ee', soft: 'var(--track)' }, key: 'todayRing' }) + '</svg><b>' + doneN + '/' + total + '</b></div>';
+          html += '<div class="mini-ring"><svg viewBox="0 0 52 52">' + ringParts({ cx: 26, cy: 26, r: 21, w: 6, ratio: ratio, p: { c: C.c, c2: C.c2, soft: 'var(--track)' }, key: 'todayRing' }) + '</svg><b>' + doneN + '/' + total + '</b></div>';
           html += '<div><h2>' + esc(t('TODAY')) + '</h2><div class="date">' + esc(dfmt({ weekday: 'short', month: 'short', day: 'numeric' }, model.today)) + '</div></div>';
-          html += '<div class="today-pts"><div class="v grad-text">+' + counter('todayPts2', o.gainedPts, 2) + (lang === 'ko' ? '%p' : ' pts') + '</div><div class="l">' + esc(t('TODAY_PTS', { n: t('PTS', { n: pts(o.todayGainPts + o.gainedPts) }) })) + '</div></div>';
+          html += '<div class="today-pts"><div class="v grad-text">+' + counter('todayPts2', p.gainedPts, 2) + (lang === 'ko' ? '%p' : ' pts') + '</div>' + (p.todayGainPts + p.gainedPts > 0 ? '<div class="l">' + esc(t('OF_TODAY', { n: t('PTS', { n: pts(p.todayGainPts + p.gainedPts) }) })) + '</div>' : '') + '</div>';
           html += '</div>';
           if (!total) {
             html += '<div class="empty"><span class="big">🌤️</span>' + esc(t('TODAY_EMPTY')) + '</div>';
           } else {
             if (doneN === total) html += '<div class="alldone">🎉 ' + esc(t('TODAY_ALL_DONE')) + '</div>';
             html += '<ul class="tlist">' + items.map(function (l) {
-              return itemHtml(l, colorOf, false);
+              return itemHtml(l, false);
             }).join('') + '</ul>';
           }
-          if (model.overdue.length) {
-            html += '<div class="sub-head">' + esc(t('OVERDUE')) + '<span>' + esc(t('OVERDUE_COUNT', { n: model.overdue.length })) + '</span></div>';
-            var shown = ui.showAllOverdue ? model.overdue.slice(0, 100) : model.overdue.slice(0, 5);
+          if (p.overdue.length) {
+            html += '<div class="sub-head">' + esc(t('OVERDUE')) + '<span>' + esc(t('OVERDUE_COUNT', { n: p.overdue.length })) + '</span></div>';
+            var shown = ui.showAllOverdue ? p.overdue.slice(0, 100) : p.overdue.slice(0, 5);
             html += '<ul class="tlist">' + shown.map(function (l) {
-              return itemHtml(l, colorOf, true);
+              return itemHtml(l, true);
             }).join('') + '</ul>';
-            if (model.overdue.length > 5) {
-              html += '<button class="more" id="moreOverdue">' + esc(ui.showAllOverdue ? t('SHOW_LESS') : t('SHOW_MORE', { n: model.overdue.length - 5 })) + '</button>';
-            }
+            if (p.overdue.length > 5) html += '<button class="more" id="moreOverdue">' + esc(ui.showAllOverdue ? t('SHOW_LESS') : t('SHOW_MORE', { n: p.overdue.length - 5 })) + '</button>';
           }
           var card = $('todayCard');
           card.innerHTML = html;
@@ -2085,7 +2195,7 @@
           if (more)
             more.addEventListener('click', function () {
               ui.showAllOverdue = !ui.showAllOverdue;
-              renderToday(lastColors());
+              renderToday();
               runArcs(card);
               runCounters(card);
             });
@@ -2096,22 +2206,19 @@
           });
           justChecked = {};
         }
-        function itemHtml(l, colorOf, late) {
-          var proj = model.projects.find(function (p) {
-            return p.id === l.projectId;
-          });
-          var c = colorOf[l.projectId];
+        function itemHtml(l, late) {
           var done = itemDone(l);
-          var ptsVal = proj && proj.total ? 100 / proj.total : 0;
+          var ptsVal = cur.total ? 100 / cur.total : 0;
           var cls = 'titem' + (done ? ' done' : '') + (justChecked[l.id] ? ' just' : '');
-          var h = '<li class="' + cls + '" style="' + pcVars(c) + '"><span class="sweep"></span>';
+          var h = '<li class="' + cls + '"><span class="sweep"></span>';
           h +=
             '<button class="check' + (done ? ' on' : '') + '" data-check="' + esc(l.id) + '" data-done="' + (done ? 1 : 0) + '"' + (l.id in pending ? ' disabled' : '') +
             ' title="' + esc(t(done ? 'MARK_UNDONE' : 'MARK_DONE')) + '" aria-label="' + esc(t(done ? 'MARK_UNDONE' : 'MARK_DONE')) + '"><svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></button>';
           h += '<div class="tmain"><div class="ttitle" data-open="' + esc(l.id) + '" title="' + esc(t('OPEN_TASK')) + '">' + esc(l.title || t('UNTITLED')) + '</div>';
-          h += '<div class="tsub"><span class="pdot"></span>' + esc(proj ? proj.title : '') + (l.parentTitle ? ' · ' + esc(l.parentTitle) : '');
-          if (l.plan !== model.today && !late && done) h += ' · ' + esc(t('CHECKED_OFF_PLAN'));
-          h += '</div></div>';
+          var subParts = [];
+          if (l.parentTitle) subParts.push(esc(l.parentTitle));
+          if (l.plan !== model.today && !late && done) subParts.push(esc(t('CHECKED_OFF_PLAN')));
+          h += '<div class="tsub">' + (subParts.length ? '<span class="pdot"></span>' + subParts.join(' · ') : '') + '</div></div>';
           h += late ? '<span class="tpts late">' + esc(fmtShort(l.plan)) + '</span>' : '<span class="tpts">+' + esc(t('PTS', { n: pts(ptsVal) })) + '</span>';
           h += '</li>';
           return h;
@@ -2124,17 +2231,16 @@
           if (toDone) {
             justChecked[id] = true;
             var r = btn.getBoundingClientRect();
-            var color = getComputedStyle(btn).getPropertyValue('--pc').trim();
-            burst(r.left + r.width / 2, r.top + r.height / 2, color);
+            burst(r.left + r.width / 2, r.top + r.height / 2, C.c);
           }
-          renderToday(lastColors());
+          renderToday();
           runArcs($('todayCard'));
           runCounters($('todayCard'));
           try {
             await PluginAPI.updateTask(id, { isDone: toDone });
           } catch (err) {
             delete pending[id];
-            renderToday(lastColors());
+            renderToday();
             runArcs($('todayCard'));
             try {
               PluginAPI.showSnack({ msg: t('UPDATE_FAILED', { error: (err && err.message) || String(err) }), type: 'ERROR' });
@@ -2149,38 +2255,25 @@
             }
           }, 1500);
         }
-        function lastColors() {
-          var m = {};
-          model.projects.forEach(function (p, i) {
-            m[p.id] = palette(p.color, i);
-          });
-          return m;
-        }
 
         // ---------- pace ----------
-        function renderPace(colorOf) {
-          var o = model.overall;
+        function renderPace() {
+          var p = cur;
           var html = '<div class="sec-head"><h2>' + esc(t('PACE_CARD')) + '</h2></div>';
-          var dated = model.projects.filter(function (p) {
-            return p.dated > 0;
-          });
-          if (!dated.length) {
+          if (!p.dated) {
             $('paceCard').innerHTML = html + '<div class="empty">' + esc(t('PACE_NONE')) + '</div>';
             return;
           }
-          var cls = o.pace > 0 ? 'good' : o.pace < 0 ? 'bad' : 'flat';
-          var sign = o.pace > 0 ? '+' : o.pace < 0 ? '−' : '±';
-          html += '<div class="pace-big"><div class="num ' + cls + '">' + sign + counter('pace', Math.abs(o.pace)) + '</div><div class="txt"><div>' + esc(paceLabel(o.pace, true)) + '</div><div>' + esc(t('KPI_PACE')) + '</div></div></div>';
-          html += '<div class="pace-rows">';
-          dated.forEach(function (p) {
-            var c = colorOf[p.id];
-            var expected = p.dueBefore / Math.max(1, p.total);
-            var shift = p.projectedEnd != null ? p.projectedEnd - p.planEnd : null;
-            var shiftTxt = shift == null ? '' : shift > 0 ? t('DAYS_LATE', { n: shift }) : shift < 0 ? t('DAYS_EARLY', { n: -shift }) : t('ON_SCHEDULE');
-            html += '<div class="pace-row" style="' + pcVars(c) + '"><div class="top"><span class="grow">' + esc(p.title) + '</span><span class="chip ' + (p.pace > 0 ? 'ahead' : p.pace < 0 ? 'behind' : 'track') + '">' + esc(paceLabel(p.pace)) + '</span></div>';
-            html += '<div class="pace-track"><div class="fill" data-w="' + (p.ratio * 100).toFixed(2) + '%"></div><div class="mark" style="left:calc(' + (expected * 100).toFixed(2) + '% - 1px)"></div></div>';
-            html += '<div class="bot"><span>' + esc(t('PROJECTED')) + ' ' + esc(p.projectedEnd != null ? fmtLong(p.projectedEnd) : '–') + '</span><span>' + esc(shiftTxt) + '</span></div></div>';
-          });
+          var cls = p.pace > 0 ? 'good' : p.pace < 0 ? 'bad' : 'flat';
+          var sign = p.pace > 0 ? '+' : p.pace < 0 ? '−' : '±';
+          html += '<div class="pace-big"><div class="num ' + cls + '">' + sign + counter('pace', Math.abs(p.pace)) + '</div><div class="txt"><div>' + esc(paceLabel(p.pace, true)) + '</div><div>' + esc(t('PACE_HINT', { due: p.dueBefore, done: p.datedDone })) + '</div></div></div>';
+          var expected = p.dueBefore / Math.max(1, p.total);
+          html += '<div class="pace-track"><div class="fill" data-w="' + (p.ratio * 100).toFixed(2) + '%"></div><div class="mark" style="left:calc(' + (expected * 100).toFixed(2) + '% - 1px)" title="' + esc(t('PLAN_MARK')) + '"></div></div>';
+          var shift = p.projectedEnd != null ? p.projectedEnd - p.planEnd : null;
+          var shiftTxt = shift == null ? '' : shift > 0 ? t('DAYS_LATE', { n: shift }) : shift < 0 ? t('DAYS_EARLY', { n: -shift }) : t('ON_SCHEDULE');
+          html += '<div class="pace-stats">';
+          html += '<div class="bd-stat"><div class="l">' + esc(t('PLAN_END')) + '</div><div class="v">' + esc(fmtLong(p.planEnd)) + '</div></div>';
+          html += '<div class="bd-stat"><div class="l">' + esc(t('PROJECTED')) + '</div><div class="v ' + (shift > 0 ? 'bad' : shift < 0 ? 'good' : '') + '">' + (p.projectedEnd != null ? esc(fmtLong(p.projectedEnd)) : '–') + '</div><div class="l2">' + esc(shiftTxt) + '</div></div>';
           html += '</div>';
           $('paceCard').innerHTML = html;
         }
@@ -2296,13 +2389,16 @@
               });
               if (!l || l.done === pending[id]) delete pending[id];
             });
-            var items = next.todayItems;
+            var selP = next.projects.find(function (x) {
+              return x.id === (cur && cur.id);
+            });
+            var items = selP ? selP.todayItems : [];
             var allDone = items.length > 0 && items.every(function (l) {
               return l.done;
             });
             if (wasAllDone === false && allDone) {
               setTimeout(function () {
-                burst(innerWidth / 2, innerHeight / 3, '#8b5cf6', true);
+                burst(innerWidth / 2, innerHeight / 3, C ? C.c : '#8b5cf6', true);
               }, 250);
             }
             wasAllDone = allDone;
@@ -2360,15 +2456,15 @@
           resizeTimer = setTimeout(function () {
             if (!model || innerWidth === lastW) return;
             lastW = innerWidth;
-            var colors = lastColors();
-            renderBurndown(colors);
+            if (!cur) return;
+            renderBurndown();
             renderHeatmap();
           }, 150);
         });
         // The greeting depends on the hour; refresh it now and then.
         setInterval(function () {
-          if (model) {
-            renderHero(lastColors());
+          if (model && cur) {
+            renderHero();
             runArcs($('hero'));
             runCounters($('hero'));
           }

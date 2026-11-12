@@ -112,8 +112,17 @@
       var dd = doneDayOf(t, off);
       if (dd != null) {
         s.days[dd] = true;
+        s.heat[dd] = (s.heat[dd] || 0) + 1;
         allDays[dd] = true;
         heat[dd] = (heat[dd] || 0) + 1;
+      }
+      // Top-level tasks: progress per task (book, chapter group, ...).
+      var topId = parent ? parent.t.id : t.id;
+      var topT = parent ? parent.t : t;
+      var row = s.taskRows[topId];
+      if (!row) {
+        row = s.taskRows[topId] = { id: topId, title: topT.title || '', total: 0, done: 0, planStart: null, planEnd: null, archived: e.archived && !parent, order: s.taskOrder.length };
+        s.taskOrder.push(topId);
       }
       var isLeaf = !!t.parentId || !(childrenOf[t.id] && childrenOf[t.id].length);
       if (!isLeaf) return;
@@ -135,13 +144,22 @@
       s.leaves.push(leaf);
       s.total++;
       if (done) s.done++;
+      row.total++;
+      if (done) row.done++;
+      if (plan != null) {
+        if (row.planStart == null || plan < row.planStart) row.planStart = plan;
+        if (row.planEnd == null || plan > row.planEnd) row.planEnd = plan;
+      }
       if (plan != null) {
         s.dated++;
         if (s.planStart == null || plan < s.planStart) s.planStart = plan;
         if (s.planEnd == null || plan > s.planEnd) s.planEnd = plan;
         if (plan < today) s.dueBefore++;
         if (done) s.datedDone++;
-        if (!done && plan >= today) heatPlan[plan] = (heatPlan[plan] || 0) + 1;
+        if (!done && plan >= today) {
+          heatPlan[plan] = (heatPlan[plan] || 0) + 1;
+          s.heatPlan[plan] = (s.heatPlan[plan] || 0) + 1;
+        }
       }
       if (done && leaf.doneDay === today) s.doneToday++;
       if (plan === today) {
@@ -175,13 +193,6 @@
       datedDone += s.datedDone;
       todayItems = todayItems.concat(s.todayItems);
       overdue = overdue.concat(s.overdue);
-    });
-    // Items checked today that were planned for another day (or none) also
-    // show up in the Today panel, so the list matches the "gained" number.
-    list.forEach(function (s) {
-      s.leaves.forEach(function (l) {
-        if (l.done && l.doneDay === today && l.plan !== today) todayItems.push(l);
-      });
     });
     todayItems.sort(function (a, b) {
       return (order[a.projectId] - order[b.projectId]) || (a.done === b.done ? 0 : a.done ? 1 : -1);
@@ -217,7 +228,12 @@
   }
 
   function newStats(p) {
+    var idx = {};
+    (p.taskIds || []).concat(p.backlogTaskIds || []).forEach(function (id, i) {
+      idx[id] = i;
+    });
     return {
+      taskIdx: idx,
       id: p.id,
       title: p.title || '',
       color: (p.theme && p.theme.primary) || null,
@@ -235,10 +251,43 @@
       doneToday: 0,
       todayItems: [],
       overdue: [],
+      heat: {},
+      heatPlan: {},
+      taskRows: {},
+      taskOrder: [],
     };
   }
 
   function finishStats(s, today) {
+    var st = streaks(s.days, today);
+    s.streak = st.current;
+    s.bestStreak = st.best;
+    s.checkedToday = !!s.days[today];
+    // Today panel for the project: planned for today, plus anything checked
+    // today that was planned for another day (or none).
+    s.leaves.forEach(function (l) {
+      if (l.done && l.doneDay === today && l.plan !== today) s.todayItems.push(l);
+    });
+    s.todayItems.sort(function (a, b) {
+      return a.done === b.done ? 0 : a.done ? 1 : -1;
+    });
+    s.overdue.sort(function (a, b) {
+      return a.plan - b.plan;
+    });
+    var BIG = 1e9;
+    s.tasks = s.taskOrder
+      .map(function (id) {
+        var r = s.taskRows[id];
+        r.ratio = r.total ? r.done / r.total : 0;
+        r.order = id in s.taskIdx ? s.taskIdx[id] : BIG + r.order;
+        return r;
+      })
+      .sort(function (a, b) {
+        return a.order - b.order;
+      });
+    delete s.taskRows;
+    delete s.taskIdx;
+    delete s.taskOrder;
     var days = Object.keys(s.days)
       .map(Number)
       .sort(function (a, b) {

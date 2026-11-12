@@ -154,3 +154,32 @@ test('future planned items feed the plan heatmap', () => {
   assert.equal(m.heatPlan[D('2026-11-20')], 2);
   assert.equal(m.heatPlan[D('2026-11-01')], undefined);
 });
+
+test('per-project heat, streak and task rows in project order', () => {
+  const ps = [{ id: 'P', title: 'Proj', taskIds: ['b', 'a'], backlogTaskIds: [] }, { id: 'Q', title: 'Q', taskIds: ['q'] }];
+  const m = L.buildModel({
+    todayStr: '2026-11-12',
+    projects: ps,
+    tasks: [
+      task({ id: 'a', subTaskIds: ['a1', 'a2'] }),
+      task({ id: 'a1', parentId: 'a', isDone: true, doneOn: at('2026-11-11'), dueDay: '2026-11-10' }),
+      task({ id: 'a2', parentId: 'a', dueDay: '2026-11-20' }),
+      task({ id: 'b', isDone: true, doneOn: at('2026-11-12') }),
+      task({ id: 'q', projectId: 'Q', isDone: true, doneOn: at('2026-11-01') }),
+    ],
+    archivedTasks: [task({ id: 'z', isDone: true, doneOn: at('2026-10-01') })],
+  });
+  const [p, q] = m.projects;
+  assert.deepEqual(p.tasks.map((r) => [r.id, r.done, r.total]), [['b', 1, 1], ['a', 1, 2], ['z', 1, 1]]);
+  assert.equal(p.tasks[1].planEnd, D('2026-11-20'));
+  assert.equal(p.tasks[2].archived, true);
+  assert.equal(p.heat[D('2026-11-11')], 1);
+  assert.equal(p.heat[D('2026-11-01')], undefined, "Q's check is not in P");
+  assert.equal(q.heat[D('2026-11-01')], 1);
+  assert.equal(p.heatPlan[D('2026-11-20')], 1);
+  assert.equal(p.streak, 2);
+  assert.equal(p.checkedToday, true);
+  assert.equal(q.streak, 0);
+  assert.equal(q.bestStreak, 1);
+  assert.deepEqual(p.todayItems.map((l) => l.id), ['b'], 'checked today, unplanned');
+});
